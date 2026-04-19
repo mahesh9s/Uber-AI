@@ -1303,132 +1303,14 @@ function Screen9() {
 // ─────────────────────────────────────────────────────────────
 function Notification({ go }) {
   return (
-    <div style={{
-      width: '100%', height: '100%', background: 'linear-gradient(180deg, #FF8C42 0%, #FFB347 50%, #FFC857 100%)',
-      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      padding: '20px', textAlign: 'center', position: 'relative', overflow: 'hidden',
+    <button onClick={go} style={{
+      width: '100%', height: '100%', border: 'none', padding: 0, background: 'none', cursor: 'pointer',
+      display: 'block',
     }}>
-      {/* time */}
-      <div style={{
-        position: 'absolute', top: 18, left: 20, fontFamily: 'SF Pro Display, system-ui',
-        fontSize: 13, fontWeight: 600, color: '#fff', letterSpacing: -0.2,
-      }}>
-        8:03
-      </div>
-
-      {/* status bar icons */}
-      <div style={{
-        position: 'absolute', top: 18, right: 20, display: 'flex', gap: 4, alignItems: 'center',
-      }}>
-        <svg width="14" height="10" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx="0.6" fill="#fff"/><rect x="4.5" y="5" width="3" height="6" rx="0.6" fill="#fff"/><rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill="#fff"/><rect x="13.5" y="0" width="3" height="11" rx="0.6" fill="#fff"/></svg>
-        <svg width="14" height="10" viewBox="0 0 15 11" fill="none"><path d="M7.5 3C9.5 3 11.4 3.8 12.8 5.1L13.8 4.1C12.1 2.4 9.9 1.4 7.5 1.4C5.1 1.4 2.9 2.4 1.2 4.1L2.2 5.1C3.6 3.8 5.5 3 7.5 3z" fill="#fff"/><circle cx="7.5" cy="9.5" r="1.3" fill="#fff"/></svg>
-        <svg width="20" height="10" viewBox="0 0 24 11"><rect x="0.5" y="0.5" width="20" height="10" rx="2.5" fill="none" stroke="#fff" strokeOpacity="0.4"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill="#fff"/></svg>
-      </div>
-
-      {/* date label */}
-      <div style={{
-        position: 'absolute', top: 72, left: 0, right: 0,
-        fontFamily: 'SF Pro Display, system-ui', fontSize: 13, fontWeight: 500,
-        color: 'rgba(255,255,255,0.8)', letterSpacing: -0.2,
-      }}>
-        Monday, June 6
-      </div>
-
-      {/* main time display */}
-      <div style={{
-        position: 'absolute', top: 200, left: 0, right: 0, bottom: 0,
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end',
-        paddingBottom: 140, pointerEvents: 'none',
-      }}>
-        <div style={{
-          fontFamily: 'SF Pro Display, system-ui', fontSize: 84, fontWeight: 300,
-          color: '#fff', letterSpacing: -2, lineHeight: 1,
-        }}>
-          8:03
-        </div>
-      </div>
-
-      {/* notification card — clickable */}
-      <button onClick={go} style={{
-        position: 'absolute', bottom: 70, left: 16, right: 16,
-        background: 'rgba(0,0,0,0.6)', border: 'none',
-        borderRadius: 20, padding: '16px', cursor: 'pointer',
-        display: 'flex', flexDirection: 'column', gap: 12,
-        transition: 'all 0.2s ease',
-      }}
-      onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.7)'; }}
-      onMouseLeave={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.6)'; }}
-      >
-        {/* header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div style={{ fontFamily: FONT, fontSize: 12, fontWeight: 800, color: '#fff', letterSpacing: -0.2 }}>Uber</div>
-            <div style={{ fontFamily: FONT, fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.6)', letterSpacing: 0.3, textTransform: 'uppercase' }}>now</div>
-          </div>
-          <div style={{
-            width: 32, height: 32, borderRadius: 8, background: '#fff', display: 'flex',
-            alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-          }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm3.5 9.5H13v2.5h-2v-2.5H8.5v-2h2.5V7h2v2.5h2.5v2z" fill="#FF8C42"/>
-            </svg>
-          </div>
-        </div>
-
-        {/* AI detected badge */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 6, marginTop: 4,
-        }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-            <path d="M12 2l2.5 6.5h7l-5.5 4.5 2.5 6.5-6-4.5-6 4.5 2.5-6.5-5.5-4.5h7z" fill="#FF8C42"/>
-          </svg>
-          <span style={{ fontFamily: FONT, fontSize: 11, fontWeight: 800, color: '#FF8C42', textTransform: 'uppercase', letterSpacing: 0.5 }}>AI DETECTED</span>
-        </div>
-
-        {/* title */}
-        <div style={{ fontFamily: FONT, fontSize: 17, fontWeight: 800, color: '#fff', letterSpacing: -0.3, textAlign: 'left', lineHeight: 1.2 }}>
-          Upcoming trip to Airport
-        </div>
-
-        {/* details */}
-        <div style={{ fontFamily: FONT, fontSize: 13, color: 'rgba(255,255,255,0.8)', textAlign: 'left', lineHeight: 1.4 }}>
-          Based on your calendar — Flight UA 247 departs at 10:30 AM
-        </div>
-
-        {/* footer */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 12, color: 'rgba(255,255,255,0.7)', textAlign: 'left' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.7)" strokeWidth="2"/><path d="M12 7v5l3 2" stroke="rgba(255,255,255,0.7)" strokeWidth="2" strokeLinecap="round"/></svg>
-            Pickup in 45 min
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z" stroke="rgba(255,255,255,0.7)" strokeWidth="1"/></svg>
-            28 min ride
-          </div>
-        </div>
-
-        {/* CTA button */}
-        <button onClick={go} style={{
-          width: '100%', background: '#fff', color: '#000', border: 'none',
-          borderRadius: 14, padding: '12px 14px', fontFamily: FONT, fontSize: 13,
-          fontWeight: 800, cursor: 'pointer', letterSpacing: -0.2, marginTop: 4,
-          transition: 'all 0.2s ease',
-        }}
-        onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.95)'; }}
-        onMouseLeave={e => { e.currentTarget.style.background = '#fff'; }}
-        >
-          Review Door to Door Ground Transportation Plan
-        </button>
-      </button>
-
-      {/* home indicator */}
-      <div style={{
-        position: 'absolute', bottom: 6, left: 0, right: 0,
-        display: 'flex', justifyContent: 'center',
-      }}>
-        <div style={{ width: 120, height: 4, borderRadius: 2, background: 'rgba(0,0,0,0.15)' }}/>
-      </div>
-    </div>
+      <img src="assets/notifciation-lockscreen.png" alt="Notification" style={{
+        width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+      }}/>
+    </button>
   );
 }
 
