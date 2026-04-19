@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Uber Door-to-Door — Print</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  html, body { margin: 0; padding: 0; background: #F2F2F4; font-family: 'DM Sans', -apple-system, system-ui, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+  button { font-family: inherit; pointer-events: none; }
+  ::-webkit-scrollbar { display: none; }
+
+  .page {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    page-break-after: always;
+    break-after: page;
+  }
+  .page:last-child { page-break-after: auto; break-after: auto; }
+  .label {
+    margin-top: 24px; font-family: 'DM Sans', system-ui;
+    font-size: 14px; font-weight: 700; color: #000; letter-spacing: -0.1px;
+  }
+
+  @page { size: A4 portrait; margin: 0.4cm; }
+  @media print {
+    body { background: #fff; }
+    .page { min-height: auto; height: 100vh; padding: 10px; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<style>
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+</style>
+
+<script type="text/babel" src="components/screens.jsx"></script>
+
+<script type="text/babel">
+const SCREENS = [
+  { n: 1, label: '1. Activate', render: () => <Screen1 go={()=>{}}/> },
+  { n: 2, label: '2. Connect', render: () => <Screen2 go={()=>{}} back={()=>{}}/> },
+  { n: 3, label: '3. Business Hub', render: () => <Screen3 go={()=>{}} openSheet={()=>{}} goManual={()=>{}}/> },
+  { n: 4, label: '4. Trip Found', render: () => <Screen4 go={()=>{}} back={()=>{}}/>, dark: true },
+  { n: 5, label: '5. Building', render: () => <Screen5Static/> },
+  { n: 6, label: '6. Plan', render: () => <Screen6 goApprove={()=>{}} goDelay={()=>{}} back={()=>{}}/>, dark: true },
+  { n: 7, label: '7. Delay', render: () => <Screen7 back={()=>{}}/> },
+  { n: 8, label: '8. Confirmed', render: () => <Screen8 go={()=>{}}/> },
+  { n: 9, label: '9. Morning Of', render: () => <Screen9/>, dark: true },
+];
+
+// Static version of Screen 5 for print (shows all steps completed)
+function Screen5Static() {
+  const steps = [
+    { type: 'check', text: 'Reading your calendar...' },
+    { type: 'check', text: 'Found flight UA847 to Chicago' },
+    { type: 'check', text: 'Found Marriott Chicago Downtown' },
+    { type: 'check', text: 'Detected 3 meetings at Salesforce Tower' },
+    { type: 'arrow', text: 'Building your ground transport plan...' },
+  ];
+  return (
+    <div style={{ width: '100%', height: '100%', background: '#fff' }}>
+      <div style={{ padding: '80px 28px 40px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div style={{ width: 58, height: 58, borderRadius: 29, border: `3px solid #EEEEEE`, borderTopColor: '#000' }}/>
+        <div style={{ fontFamily: FONT, fontSize: 26, fontWeight: 800, letterSpacing: -0.6, marginTop: 26, textAlign: 'center' }}>Building your plan</div>
+        <div style={{ fontFamily: FONT, fontSize: 14, color: COLORS.gray500, marginTop: 8, textAlign: 'center' }}>Uber AI is analyzing your trip...</div>
+        <div style={{ width: '100%', marginTop: 40, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {steps.map((s, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{
+                width: 26, height: 26, borderRadius: 13, flexShrink: 0,
+                background: s.type === 'check' ? COLORS.green : '#000',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                {s.type === 'check' && <svg width="12" height="12" viewBox="0 0 12 12"><path d="M3 6l2 2 4-4" stroke="#fff" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                {s.type === 'arrow' && <svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5h6M6 2l3 3-3 3" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>}
+              </div>
+              <div style={{ fontFamily: FONT, fontSize: 14.5, fontWeight: 600 }}>{s.text}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PhoneFrame({ children, dark = false }) {
+  return (
+    <div style={{
+      width: 390, height: 844, background: '#fff', borderRadius: 48,
+      border: '2px solid #1A1A1A', position: 'relative', overflow: 'hidden',
+      boxShadow: '0 20px 50px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06)',
+    }}>
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, zIndex: 40,
+        height: 54, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '18px 30px 0', pointerEvents: 'none',
+      }}>
+        <div style={{ fontFamily: '-apple-system, SF Pro, system-ui', fontSize: 15, fontWeight: 600, color: dark ? '#fff' : '#000', letterSpacing: -0.2 }}>7:55</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <svg width="17" height="11" viewBox="0 0 17 11"><rect x="0" y="7" width="3" height="4" rx="0.6" fill={dark ? '#fff' : '#000'}/><rect x="4.5" y="5" width="3" height="6" rx="0.6" fill={dark ? '#fff' : '#000'}/><rect x="9" y="2.5" width="3" height="8.5" rx="0.6" fill={dark ? '#fff' : '#000'}/><rect x="13.5" y="0" width="3" height="11" rx="0.6" fill={dark ? '#fff' : '#000'}/></svg>
+          <svg width="24" height="11" viewBox="0 0 24 11"><rect x="0.5" y="0.5" width="20" height="10" rx="2.5" fill="none" stroke={dark ? '#fff' : '#000'} strokeOpacity="0.4"/><rect x="2" y="2" width="17" height="7" rx="1.5" fill={dark ? '#fff' : '#000'}/></svg>
+        </div>
+      </div>
+      <div style={{ position: 'absolute', top: 11, left: '50%', transform: 'translateX(-50%)', width: 120, height: 35, borderRadius: 22, background: '#000', zIndex: 50 }}/>
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 60, height: 28, display: 'flex', justifyContent: 'center', alignItems: 'flex-end', paddingBottom: 8, pointerEvents: 'none' }}>
+        <div style={{ width: 134, height: 5, borderRadius: 3, background: 'rgba(0,0,0,0.28)' }}/>
+      </div>
+      <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>{children}</div>
+    </div>
+  );
+}
+
+function PrintDoc() {
+  return (
+    <div>
+      {SCREENS.map(s => (
+        <div className="page" key={s.n}>
+          <PhoneFrame dark={s.dark}>{s.render()}</PhoneFrame>
+          <div className="label">{s.label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<PrintDoc/>);
+
+// auto print after fonts + JSX are ready
+(async () => {
+  try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch(e) {}
+  setTimeout(() => window.print(), 700);
+})();
+</script>
+</body>
+</html>
