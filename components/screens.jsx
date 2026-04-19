@@ -923,7 +923,7 @@ function Screen8({ go }) {
       <div style={{ padding: '12px 20px 14px' }}>
         <div style={{ background: '#000', color: '#fff', borderRadius: 16, padding: 18 }}>
           <div style={{ fontFamily: FONT, fontSize: 10.5, fontWeight: 700, letterSpacing: 1.4, color: '#A8A8A8', textTransform: 'uppercase' }}>Upcoming trip</div>
-          <div style={{ fontFamily: FONT, fontSize: 20, fontWeight: 800, letterSpacing: -0.4, marginTop: 4 }}>San Jose · May 4–16</div>
+          <div style={{ fontFamily: FONT, fontSize: 20, fontWeight: 800, letterSpacing: -0.4, marginTop: 4 }}>San Jose · May 4–6</div>
           <div style={{ height: 0.5, background: 'rgba(255,255,255,0.12)', margin: '14px 0 2px' }}/>
           {[
             { icon: 'car', text: '6 rides pre-booked across 3 days' },
@@ -1447,13 +1447,13 @@ function TripDetected({ go }) {
           </span>
         </div>
         <div style={{ fontFamily: FONT, fontSize: 11, fontWeight: 700, letterSpacing: 1.2, color: '#A8A8A8', textTransform: 'uppercase', marginBottom: 8 }}>
-          Chicago, Illinois
+          San Jose, California
         </div>
         <div style={{ fontFamily: FONT, fontSize: 26, fontWeight: 800, letterSpacing: -0.5, lineHeight: 1.12 }}>
           New trip detected from your calendar
         </div>
         <div style={{ fontFamily: FONT, fontSize: 14, color: '#A8A8A8', marginTop: 8 }}>
-          Apr 17–19, 2026 · 3 days · via Google Calendar
+          May 4–6, 2026 · 3 days · via Google Calendar
         </div>
       </div>
 
@@ -1461,8 +1461,8 @@ function TripDetected({ go }) {
       <div style={{ padding: '18px 20px 0' }}>
         <div style={{ background: COLORS.gray50, borderRadius: 16, overflow: 'hidden', border: `0.5px solid ${COLORS.gray200}` }}>
           {[
-            { icon: '✈️', label: 'Flight', value: 'UA847 · Apr 17, 6:15 AM', status: 'Detected' },
-            { icon: '🏨', label: 'Hotel', value: 'Marriott Chicago Downtown', status: 'Detected' },
+            { icon: '✈️', label: 'Flight', value: 'AS401 · May 4, 7:30 AM', status: 'Detected' },
+            { icon: '🏨', label: 'Hotel', value: 'Marriott San Jose', status: 'Detected' },
             { icon: '📅', label: 'Meetings', value: '3 meetings · Salesforce Tower', status: 'Detected' },
           ].map((r, i) => (
             <div key={i} style={{
