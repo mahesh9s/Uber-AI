@@ -6047,6 +6047,8 @@ const SEQUENCES = {
     { key: 'authSMS', label: '3. Verify' },
     { key: 'authName', label: '4. Profile' },
     { key: 'calendar', label: '5. Calendar' },
+    { key: 'calendarScanning', label: '5a. Scanning' },
+    { key: 'eventsPreview', label: '5b. Events Preview' },
     { key: 'businessHub', label: '6. Business Hub (if skipped)' },
     { key: 'notification', label: '7. Notification' },
     { key: 'tripDetected', label: '8. New Trip Detected' },
@@ -6062,6 +6064,8 @@ const SEQUENCES = {
     { key: 'authPhone', label: '2. Phone' },
     { key: 'welcomeBack', label: '3. Welcome back' },
     { key: 'calendar', label: '4. Calendar' },
+    { key: 'calendarScanning', label: '4a. Scanning' },
+    { key: 'eventsPreview', label: '4b. Events Preview' },
     { key: 'businessHub', label: '5. Business Hub (if skipped)' },
     { key: 'notification', label: '6. Notification' },
     { key: 'tripDetected', label: '7. New Trip Detected' },
@@ -6143,6 +6147,7 @@ function App() {
   });
   const [sheetOpen, setSheetOpen] = React.useState(false);
   const [manual, setManual] = React.useState(false);
+  const [calendarSource, setCalendarSource] = React.useState('gmail');
 
   const sequence = SEQUENCES[persona];
   const clampedStep = Math.min(step, sequence.length - 1);
@@ -6172,10 +6177,12 @@ function App() {
       case 'authSMS': content = <AuthSMS go={goNext} back={goBack}/>; break;
       case 'authName': content = <AuthName go={goNext} back={goBack}/>; break;
       case 'welcomeBack': content = <AuthWelcomeBack go={goNext} back={goBack}/>; break;
-      case 'calendar': content = <Screen2 go={() => goToKey('notification')} skip={() => goToKey('businessHub')} back={goBack}/>; break;
+      case 'calendar': content = <Screen2 goToScanning={(source) => { setCalendarSource(source); goToKey('calendarScanning'); }} skip={() => goToKey('businessHub')} back={goBack}/>; break;
+      case 'calendarScanning': content = <CalendarScanning go={() => goToKey('eventsPreview')}/>; break;
+      case 'eventsPreview': content = <Screen2EventsPreview go={() => goToKey('notification')} calendarSource={calendarSource}/>; break;
       case 'businessHub': content = <Screen3 go={() => goToKey('notification')} openSheet={() => setSheetOpen(true)} goManual={() => setManual(true)}/>; break;
       case 'notification': content = <Notification go={() => goToKey('tripDetected')}/>; break;
-      case 'tripDetected': content = <TripDetected go={() => goToKey('tripFound')}/>; break;
+      case 'tripDetected': content = <TripDetected go={() => goToKey('tripFound')} calendarSource={calendarSource}/>; break;
       case 'tripFound': content = <Screen4 go={goNext} back={goBack}/>; break;
       case 'building': content = <Screen5 go={goNext}/>; break;
       case 'plan': content = <Screen6 goApprove={() => goToKey('confirmed')} goDelay={() => goToKey('delay')} back={() => goToKey('tripFound')}/>; break;

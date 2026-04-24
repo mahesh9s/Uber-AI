@@ -21,6 +21,29 @@ const COLORS = {
 const FONT = "'DM Sans', -apple-system, 'Segoe UI', system-ui, sans-serif";
 
 // ─────────────────────────────────────────────────────────────
+// Mock Calendar Data
+// ─────────────────────────────────────────────────────────────
+const MOCK_CALENDAR_EVENTS = {
+  flights: [
+    { type: 'flight', airline: 'Alaska Airlines', number: 'AS401', date: 'May 4', time: '7:30 AM', from: 'SEA', to: 'SJC', detected: true },
+    { type: 'flight', airline: 'Alaska Airlines', number: 'AS402', date: 'May 6', time: '9:15 AM', from: 'SJC', to: 'SEA', detected: true },
+  ],
+  hotel: {
+    type: 'hotel',
+    name: 'Marriott San Jose',
+    checkIn: 'May 4',
+    checkOut: 'May 6',
+    address: 'Downtown San Jose',
+    detected: true,
+  },
+  meetings: [
+    { type: 'meeting', title: '11:00 AM Meeting', date: 'May 4', time: '11:00 AM', location: 'Ace Corp HQ', detected: true },
+    { type: 'meeting', title: 'Team Sync', date: 'May 5', time: '9:00 AM', location: 'Salesforce Tower', detected: true },
+    { type: 'meeting', title: 'Strategy Session', date: 'May 5', time: '2:00 PM', location: 'Salesforce Tower', detected: true },
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────
 // Shared primitives
 // ─────────────────────────────────────────────────────────────
 function ScreenShell({ children, bg = '#fff', stickyBottom = null }) {
@@ -70,6 +93,180 @@ function BackArrow({ onClick, dark = false }) {
         <path d="M11 4L6 9l5 5" stroke={dark ? '#fff' : '#000'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     </button>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Calendar Scanning — Loading state during calendar connection
+// ─────────────────────────────────────────────────────────────
+function CalendarScanning({ go }) {
+  const [stage, setStage] = React.useState(0);
+  const stages = [
+    'Looking for flights...',
+    'Finding accommodations...',
+    'Detecting meetings...',
+    'Building your trip...',
+  ];
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => go(), 3000);
+    const stageTimer = setInterval(() => {
+      setStage(s => (s + 1) % stages.length);
+    }, 600);
+    return () => { clearTimeout(timer); clearInterval(stageTimer); };
+  }, [go]);
+
+  return (
+    <div style={{
+      width: '100%', height: '100%', background: '#000', display: 'flex',
+      flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      color: '#fff', fontFamily: FONT, gap: 24, padding: '20px',
+    }}>
+      <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: -0.6 }}>
+        Scanning your calendar
+      </div>
+
+      {/* Animated scanning indicator */}
+      <div style={{ position: 'relative', width: 60, height: 60 }}>
+        <svg width="60" height="60" viewBox="0 0 60 60" style={{ position: 'absolute' }}>
+          <circle cx="30" cy="30" r="25" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2"/>
+          <circle cx="30" cy="30" r="25" fill="none" stroke="#E87722" strokeWidth="2"
+            strokeDasharray="157" strokeDashoffset="0"
+            style={{ animation: 'rotate 2s linear infinite', transformOrigin: '30px 30px' }}/>
+        </svg>
+      </div>
+
+      {/* Stage text */}
+      <div style={{ fontSize: 14, color: '#A8A8A8', minHeight: 20 }}>
+        {stages[stage]}
+      </div>
+
+      <style>{`
+        @keyframes rotate {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Screen 2a — Calendar Events Preview
+// ─────────────────────────────────────────────────────────────
+function Screen2EventsPreview({ go, calendarSource = 'Gmail' }) {
+  const allEvents = [
+    ...MOCK_CALENDAR_EVENTS.flights,
+    MOCK_CALENDAR_EVENTS.hotel,
+    ...MOCK_CALENDAR_EVENTS.meetings,
+  ].sort((a, b) => {
+    const dateOrder = { 'May 4': 0, 'May 5': 1, 'May 6': 2 };
+    const dateA = dateOrder[a.date] ?? 0;
+    const dateB = dateOrder[b.date] ?? 0;
+    return dateA - dateB;
+  });
+
+  const sourceLabel = calendarSource === 'outlook' ? 'Outlook' : 'Gmail';
+
+  return (
+    <ScreenShell stickyBottom={<BlackButton onClick={go}>Looks good? Continue →</BlackButton>}>
+      <div style={{ padding: '58px 20px 0' }}>
+        <div style={{ fontFamily: FONT, fontSize: 26, fontWeight: 800, letterSpacing: -0.6, marginBottom: 8 }}>
+          Calendar events detected
+        </div>
+        <div style={{ fontFamily: FONT, fontSize: 14, color: COLORS.gray500, marginBottom: 20 }}>
+          {allEvents.length} events found via {sourceLabel} Calendar
+        </div>
+      </div>
+
+      {/* Timeline of events */}
+      <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {allEvents.map((event, i) => {
+          if (event.type === 'flight') {
+            return (
+              <div key={i} style={{
+                background: '#fff', border: `1px solid ${COLORS.gray200}`, borderRadius: 12,
+                padding: 14, display: 'flex', gap: 12, alignItems: 'flex-start',
+              }}>
+                <div style={{
+                  width: 40, height: 40, borderRadius: 8, background: COLORS.orange, display: 'flex',
+                  alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 2l2.3 6.2h6.5l-5.2 4 2 6.3-6-4.6-6 4.6 2-6.3-5.2-4h6.5L12 2z" fill="#fff"/></svg>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontFamily: FONT, fontSize: 13, fontWeight: 700 }}>
+                    {event.airline}
+                  </div>
+                  <div style={{ fontFamily: FONT, fontSize: 12, color: COLORS.gray500, marginTop: 2 }}>
+                    {event.number} • {event.from} → {event.to} • {event.date}, {event.time}
+                  </div>
+                  <div style={{ marginTop: 6, display: 'inline-block', background: COLORS.green, color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 4 }}>
+                    ✓ Flight Detected
+                  </div>
+                </div>
+              </div>
+            );
+          } else if (event.type === 'hotel') {
+            return (
+              <div key={i} style={{
+                background: '#fff', border: `1px solid ${COLORS.gray200}`, borderRadius: 12,
+                padding: 14, display: 'flex', gap: 12, alignItems: 'flex-start',
+              }}>
+                <div style={{
+                  width: 40, height: 40, borderRadius: 8, background: COLORS.green, display: 'flex',
+                  alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24"><path d="M5 11V9h2V7c0-1.1.9-2 2-2h6c1.1 0 2 .9 2 2v2h2v2m0 7v2h2v2h-2v1h-2v-1H7v1H5v-1H3v-2h2v-2m2-3h10v6H7z" fill="#fff"/></svg>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontFamily: FONT, fontSize: 13, fontWeight: 700 }}>
+                    {event.name}
+                  </div>
+                  <div style={{ fontFamily: FONT, fontSize: 12, color: COLORS.gray500, marginTop: 2 }}>
+                    {event.checkIn} - {event.checkOut} • {event.address}
+                  </div>
+                  <div style={{ marginTop: 6, display: 'inline-block', background: COLORS.green, color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 4 }}>
+                    ✓ Hotel Found
+                  </div>
+                </div>
+              </div>
+            );
+          } else if (event.type === 'meeting') {
+            return (
+              <div key={i} style={{
+                background: '#fff', border: `1px solid ${COLORS.gray200}`, borderRadius: 12,
+                padding: 14, display: 'flex', gap: 12, alignItems: 'flex-start',
+              }}>
+                <div style={{
+                  width: 40, height: 40, borderRadius: 8, background: COLORS.blue, display: 'flex',
+                  alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z" fill="#fff"/></svg>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontFamily: FONT, fontSize: 13, fontWeight: 700 }}>
+                    {event.title}
+                  </div>
+                  <div style={{ fontFamily: FONT, fontSize: 12, color: COLORS.gray500, marginTop: 2 }}>
+                    {event.date}, {event.time} • {event.location}
+                  </div>
+                  <div style={{ marginTop: 6, display: 'inline-block', background: COLORS.green, color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 4 }}>
+                    ✓ Meeting Detected
+                  </div>
+                </div>
+              </div>
+            );
+          }
+        })}
+      </div>
+
+      <div style={{ padding: '20px 20px 0' }}>
+        <div style={{ background: COLORS.gray50, borderRadius: 12, padding: '14px 16px', fontFamily: FONT, fontSize: 12.5, color: COLORS.gray700, lineHeight: 1.45 }}>
+          Uber AI extracted these events from your calendar to build your ground transportation plan.
+        </div>
+      </div>
+    </ScreenShell>
   );
 }
 
@@ -132,16 +329,21 @@ function Screen1({ go }) {
 // ─────────────────────────────────────────────────────────────
 // Screen 2 — Link Calendar
 // ─────────────────────────────────────────────────────────────
-function Screen2({ go, back, skip }) {
+function Screen2({ go, back, skip, goToScanning }) {
   const [selected, setSelected] = React.useState(0);
   const opts = [
-    { title: 'Connect with Gmail', sub: 'Read-only · for Gmail users', icon: 'gmail' },
-    { title: 'Connect with Outlook', sub: 'Read-only · for Microsoft 365 users', icon: 'outlook' },
+    { title: 'Connect with Gmail', sub: 'Read-only · for Gmail users', icon: 'gmail', source: 'gmail' },
+    { title: 'Connect with Outlook', sub: 'Read-only · for Microsoft 365 users', icon: 'outlook', source: 'outlook' },
   ];
+  const handleConnect = () => {
+    // Pass the selected calendar source to scanning component
+    if (goToScanning) goToScanning(opts[selected].source);
+    else go();
+  };
   return (
     <ScreenShell stickyBottom={
       <>
-        <BlackButton onClick={go}>Connect and continue →</BlackButton>
+        <BlackButton onClick={handleConnect}>Connect and continue →</BlackButton>
         <GhostText onClick={skip || go} style={{ paddingBottom: 0 }}>Skip for now</GhostText>
       </>
     }>
@@ -1317,7 +1519,8 @@ function Notification({ go }) {
 // ─────────────────────────────────────────────────────────────
 // Trip Detected — shown after calendar connect / Enable now
 // ─────────────────────────────────────────────────────────────
-function TripDetected({ go }) {
+function TripDetected({ go, calendarSource = 'gmail' }) {
+  const sourceLabel = calendarSource === 'outlook' ? 'Outlook Calendar' : 'Gmail Calendar';
   return (
     <ScreenShell>
       {/* header */}
@@ -1335,7 +1538,7 @@ function TripDetected({ go }) {
           New trip detected from your calendar
         </div>
         <div style={{ fontFamily: FONT, fontSize: 14, color: '#A8A8A8', marginTop: 8 }}>
-          May 4–6, 2026 · 3 days · via Google Calendar
+          May 4–6, 2026 · 3 days · via {sourceLabel}
         </div>
       </div>
 
@@ -1568,5 +1771,6 @@ function AuthWelcomeBack({ back, go }) {
 Object.assign(window, {
   Screen1, Screen2, Screen3, Screen4, Screen5, Screen6, Screen7, Screen8, Screen9,
   AuthPhone, AuthSMS, AuthName, AuthWelcomeBack, Notification, TripDetected,
+  CalendarScanning, Screen2EventsPreview,
   EnableSheet, ManualForm, COLORS, FONT,
 });
