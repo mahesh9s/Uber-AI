@@ -327,35 +327,210 @@ function Screen1({ go }) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Screen 2 — Link Calendar
+// Screen 2 — Connect Calendar (Simplified with tiered entry)
 // ─────────────────────────────────────────────────────────────
-function Screen2({ go, back, skip, goToScanning }) {
-  const [selected, setSelected] = React.useState(0);
-  const opts = [
-    { title: 'Connect with Gmail', sub: 'Read-only · for Gmail users', icon: 'gmail', source: 'gmail' },
-    { title: 'Connect with Outlook', sub: 'Read-only · for Microsoft 365 users', icon: 'outlook', source: 'outlook' },
-  ];
-  const handleConnect = () => {
-    // Pass the selected calendar source to scanning component
-    if (goToScanning) goToScanning(opts[selected].source);
-    else go();
-  };
+function Screen2({ go, back, skip, goToPermission, goToOAuth }) {
   return (
     <ScreenShell stickyBottom={
       <>
-        <BlackButton onClick={handleConnect}>Connect and continue →</BlackButton>
-        <GhostText onClick={skip || go} style={{ paddingBottom: 0 }}>Skip for now</GhostText>
+        <BlackButton onClick={() => goToPermission ? goToPermission() : go()}>
+          Allow calendar access →
+        </BlackButton>
+        <button onClick={() => goToOAuth && goToOAuth()} style={{
+          width: '100%', background: 'transparent', border: 'none',
+          padding: '14px 20px 0', fontFamily: FONT, fontSize: 13.5,
+          color: COLORS.gray500, cursor: 'pointer', textAlign: 'center',
+          textDecoration: 'underline', textUnderlineOffset: 3,
+        }}>
+          Work calendar not on this device? Connect manually
+        </button>
       </>
     }>
       <div style={{ padding: '58px 20px 0' }}>
         <BackArrow onClick={back}/>
       </div>
-      <div style={{ padding: '18px 24px 12px' }}>
+
+      {/* Hero icon */}
+      <div style={{ padding: '28px 24px 4px', display: 'flex', justifyContent: 'center' }}>
+        <div style={{
+          width: 88, height: 88, borderRadius: 24, background: COLORS.black,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+        }}>
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="5" width="18" height="16" rx="2" stroke="#fff" strokeWidth="1.8"/>
+            <path d="M3 9h18M8 3v4M16 3v4" stroke="#fff" strokeWidth="1.8" strokeLinecap="round"/>
+            <circle cx="17" cy="15" r="3" fill="#E87722"/>
+            <path d="M15.5 15l1 1 2-2" stroke="#fff" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div style={{ padding: '24px 24px 12px', textAlign: 'center' }}>
         <h1 style={{ fontFamily: FONT, fontSize: 28, fontWeight: 800, lineHeight: 1.12, letterSpacing: -0.7, margin: 0 }}>
-          Connect your travel info
+          Connect your calendar
         </h1>
-        <p style={{ fontFamily: FONT, fontSize: 14.5, lineHeight: 1.45, color: COLORS.gray500, margin: '10px 0 22px' }}>
-          So Uber AI can automatically detect your trips and build your door to door group transporation plan. You control what we access.
+        <p style={{ fontFamily: FONT, fontSize: 14.5, lineHeight: 1.5, color: COLORS.gray500, margin: '12px 20px 0' }}>
+          Uber AI reads your upcoming flights, hotels, and meetings to automatically build your complete door-to-door ground transport plan. Every ride, timed and ready — so you never have to worry about traffic delays or last-minute flight changes.
+        </p>
+      </div>
+
+      {/* Privacy bullets */}
+      <div style={{ padding: '28px 28px 12px' }}>
+        {[
+          { title: 'Read-only access', body: 'We only look for travel events. Never write or change anything.' },
+          { title: 'Never stored', body: 'Events are processed in real-time and never saved to our servers.' },
+          { title: 'Revoke anytime', body: 'Disconnect instantly in Settings whenever you want.' },
+        ].map((f, i) => (
+          <div key={i} style={{ display: 'flex', gap: 12, padding: '10px 0' }}>
+            <div style={{ flexShrink: 0, width: 22, height: 22, borderRadius: 11, background: COLORS.greenBg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 2 }}>
+              <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6l3 3 5-6" stroke={COLORS.green} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: FONT, fontSize: 14, fontWeight: 700, letterSpacing: -0.2 }}>{f.title}</div>
+              <div style={{ fontFamily: FONT, fontSize: 12.5, color: COLORS.gray500, marginTop: 2, lineHeight: 1.4 }}>{f.body}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </ScreenShell>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Calendar Permission — Full-screen native permission page
+// ─────────────────────────────────────────────────────────────
+function CalendarPermission({ onAllow, onDeny, onSkip, back }) {
+  const [denied, setDenied] = React.useState(false);
+
+  if (denied) {
+    return (
+      <ScreenShell stickyBottom={
+        <>
+          <BlackButton onClick={onSkip}>Skip for now</BlackButton>
+          <GhostText onClick={() => setDenied(false)} style={{ paddingBottom: 0 }}>
+            Change my mind — allow access
+          </GhostText>
+        </>
+      }>
+        <div style={{ padding: '58px 20px 0' }}>
+          <BackArrow onClick={back}/>
+        </div>
+        <div style={{ padding: '60px 28px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{
+            width: 72, height: 72, borderRadius: 36, background: COLORS.gray100,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke={COLORS.gray500} strokeWidth="1.8"/>
+              <path d="M8 12h8" stroke={COLORS.gray500} strokeWidth="1.8" strokeLinecap="round"/>
+            </svg>
+          </div>
+          <h1 style={{ fontFamily: FONT, fontSize: 24, fontWeight: 800, letterSpacing: -0.5, margin: '20px 0 10px', textAlign: 'center' }}>
+            Calendar access denied
+          </h1>
+          <p style={{ fontFamily: FONT, fontSize: 14, color: COLORS.gray500, textAlign: 'center', lineHeight: 1.5, margin: 0 }}>
+            Without calendar access, Uber AI can't auto-detect your trips. You can skip for now and add trips manually, or change your mind.
+          </p>
+        </div>
+      </ScreenShell>
+    );
+  }
+
+  return (
+    <div style={{ width: '100%', height: '100%', background: '#fff', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '70px 28px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+        {/* App icon style */}
+        <div style={{
+          width: 78, height: 78, borderRadius: 18, background: COLORS.black,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 10px 28px rgba(0,0,0,0.18)', marginBottom: 20,
+        }}>
+          <span style={{ fontFamily: FONT, fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: -0.5 }}>Uber</span>
+        </div>
+
+        <h1 style={{ fontFamily: FONT, fontSize: 22, fontWeight: 800, letterSpacing: -0.4, margin: '4px 0 14px', lineHeight: 1.2 }}>
+          "Uber" Would Like to Access Your Calendar
+        </h1>
+
+        {/* What we access / what we don't */}
+        <div style={{ marginTop: 28, width: '100%', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ background: COLORS.greenBg, borderRadius: 12, padding: '12px 14px', display: 'flex', gap: 10, textAlign: 'left' }}>
+            <svg width="18" height="18" viewBox="0 0 18 18" style={{ flexShrink: 0, marginTop: 1 }}>
+              <circle cx="9" cy="9" r="8" fill={COLORS.green}/>
+              <path d="M5 9l2.5 2.5L13 6" stroke="#fff" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <div style={{ fontFamily: FONT, fontSize: 12.5, color: '#065F46', fontWeight: 600, lineHeight: 1.45 }}>
+              <strong>We will:</strong> read event titles, times, and locations to find travel plans
+            </div>
+          </div>
+          <div style={{ background: COLORS.gray50, borderRadius: 12, padding: '12px 14px', display: 'flex', gap: 10, textAlign: 'left' }}>
+            <svg width="18" height="18" viewBox="0 0 18 18" style={{ flexShrink: 0, marginTop: 1 }}>
+              <circle cx="9" cy="9" r="8" fill={COLORS.gray400}/>
+              <path d="M6 6l6 6M12 6l-6 6" stroke="#fff" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+            </svg>
+            <div style={{ fontFamily: FONT, fontSize: 12.5, color: COLORS.gray700, fontWeight: 600, lineHeight: 1.45 }}>
+              <strong>We won't:</strong> store event data, share with third parties, or modify your calendar
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Action buttons — iOS-style native feel */}
+      <div style={{ flexShrink: 0, borderTop: `0.5px solid ${COLORS.gray200}`, display: 'flex' }}>
+        <button onClick={() => setDenied(true)} style={{
+          flex: 1, padding: '18px 16px', background: '#fff', border: 'none',
+          borderRight: `0.5px solid ${COLORS.gray200}`,
+          fontFamily: FONT, fontSize: 16, fontWeight: 500, color: COLORS.black, cursor: 'pointer',
+        }}>
+          Don't Allow
+        </button>
+        <button onClick={onAllow} style={{
+          flex: 1, padding: '18px 16px', background: '#fff', border: 'none',
+          fontFamily: FONT, fontSize: 16, fontWeight: 800, color: COLORS.blue, cursor: 'pointer',
+        }}>
+          Allow
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Calendar OAuth — Escape hatch for cloud calendar users
+// ─────────────────────────────────────────────────────────────
+function CalendarOAuth({ go, back, goToScanning }) {
+  const [selected, setSelected] = React.useState(null);
+  const opts = [
+    { title: 'Continue with Gmail', sub: 'Google Calendar · Google Workspace', icon: 'gmail', source: 'gmail' },
+    { title: 'Continue with Outlook', sub: 'Microsoft 365 · Exchange Online', icon: 'outlook', source: 'outlook' },
+    { title: 'Continue with iCloud', sub: 'Apple Calendar · iCloud.com', icon: 'icloud', source: 'icloud' },
+  ];
+
+  const handleContinue = () => {
+    if (selected === null) return;
+    if (goToScanning) goToScanning(opts[selected].source);
+    else go();
+  };
+
+  return (
+    <ScreenShell stickyBottom={
+      <BlackButton
+        onClick={handleContinue}
+        style={{ opacity: selected === null ? 0.35 : 1, cursor: selected === null ? 'default' : 'pointer' }}
+      >
+        {selected === null ? 'Select a calendar' : `Sign in with ${opts[selected].title.replace('Continue with ', '')} →`}
+      </BlackButton>
+    }>
+      <div style={{ padding: '58px 20px 0' }}>
+        <BackArrow onClick={back}/>
+      </div>
+      <div style={{ padding: '18px 24px 8px' }}>
+        <h1 style={{ fontFamily: FONT, fontSize: 26, fontWeight: 800, lineHeight: 1.15, letterSpacing: -0.6, margin: 0 }}>
+          Connect your work calendar
+        </h1>
+        <p style={{ fontFamily: FONT, fontSize: 14, lineHeight: 1.5, color: COLORS.gray500, margin: '10px 0 22px' }}>
+          Sign in to pull your work trips from the cloud — useful if your work calendar isn't synced to this device.
         </p>
       </div>
 
@@ -370,10 +545,7 @@ function Screen2({ go, back, skip, goToScanning }) {
           }}>
             <OptIcon kind={o.icon}/>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: -0.2 }}>{o.title}</div>
-                {o.badge && <span style={{ background: COLORS.blue, color: '#fff', fontSize: 9.5, fontWeight: 700, padding: '2px 7px', borderRadius: 10, letterSpacing: 0.1 }}>{o.badge}</span>}
-              </div>
+              <div style={{ fontSize: 15, fontWeight: 700, letterSpacing: -0.2 }}>{o.title}</div>
               <div style={{ fontSize: 12.5, color: COLORS.gray500, marginTop: 3 }}>{o.sub}</div>
             </div>
             <div style={{
@@ -387,14 +559,14 @@ function Screen2({ go, back, skip, goToScanning }) {
         ))}
       </div>
 
-      <div style={{ padding: '18px 20px 20px' }}>
+      <div style={{ padding: '20px 20px 20px' }}>
         <div style={{ background: COLORS.gray50, borderRadius: 12, padding: '14px 16px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ flexShrink: 0, marginTop: 1 }}>
             <rect x="3" y="8" width="12" height="8" rx="1.5" stroke="#000" strokeWidth="1.5"/>
             <path d="M6 8V6a3 3 0 016 0v2" stroke="#000" strokeWidth="1.5"/>
           </svg>
           <div style={{ fontFamily: FONT, fontSize: 12.5, color: COLORS.gray700, lineHeight: 1.45 }}>
-            Read-only access only. We never store email content. Revoke anytime in Settings.
+            Read-only access · We'll redirect you to sign in securely · Revoke anytime in Settings.
           </div>
         </div>
       </div>
@@ -423,6 +595,17 @@ function OptIcon({ kind }) {
       <path fill="#50D9FF" d="M44 16l-10.5 7L23 16v-5.5h21z" opacity=".4"/>
     </svg>
   ));
+  if (kind === 'icloud') return box('#fff', (
+    <svg width="26" height="22" viewBox="0 0 48 48">
+      <defs>
+        <linearGradient id="icloudGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#3B9EFF"/>
+          <stop offset="100%" stopColor="#0B6BE6"/>
+        </linearGradient>
+      </defs>
+      <path fill="url(#icloudGrad)" d="M35.5 20.5c-.1 0-.2 0-.3.1C34 14.5 28.5 10 22 10c-7.2 0-13 5.8-13 13 0 .5 0 1 .1 1.5C5.6 25.4 3 28.9 3 33c0 4.9 4.1 9 9 9h23c4.1 0 7.5-3.4 7.5-7.5S39.6 20.5 35.5 20.5z"/>
+    </svg>
+  ));
   if (kind === 'forward') return box(COLORS.gray50, <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="3" y="6" width="16" height="11" rx="1.5" stroke="#000" strokeWidth="1.5"/><path d="M3 7l8 5 8-5" stroke="#000" strokeWidth="1.5"/><path d="M14 3l3 2-3 2" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>);
   return box(COLORS.gray50, <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M13 4l5 5-9 9H4v-5l9-9z" stroke="#000" strokeWidth="1.5" strokeLinejoin="round"/></svg>);
 }
@@ -430,7 +613,14 @@ function OptIcon({ kind }) {
 // ─────────────────────────────────────────────────────────────
 // Screen 3 — Business Hub with banner
 // ─────────────────────────────────────────────────────────────
-function Screen3({ go, openSheet, goManual }) {
+function Screen3({ go, openSheet, goManual, calendarConnected, setCalendarConnected }) {
+  // Local fallback so the screen works standalone
+  const [localConnected, setLocalConnected] = React.useState(false);
+  const connected = calendarConnected !== undefined ? calendarConnected : localConnected;
+  const toggle = () => {
+    if (setCalendarConnected) setCalendarConnected(!connected);
+    else setLocalConnected(!connected);
+  };
   return (
     <ScreenShell bg="#fff">
       {/* header illustration */}
@@ -470,34 +660,76 @@ function Screen3({ go, openSheet, goManual }) {
         </div>
       </div>
 
-      {/* New feature banner */}
-      <div style={{ padding: '16px 16px 0' }}>
-        <div style={{ background: '#000', borderRadius: 16, padding: 18, color: '#fff', fontFamily: FONT }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-            <div style={{ width: 8, height: 8, borderRadius: 4, background: COLORS.green, boxShadow: `0 0 0 3px ${COLORS.green}33` }}/>
-            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', color: '#CFE9DE' }}>New — Uber Business Travel AI</span>
-          </div>
-          <div style={{ fontSize: 19, fontWeight: 800, lineHeight: 1.2, letterSpacing: -0.4, marginBottom: 8 }}>
-            Let Uber plan your next business trip automatically
-          </div>
-          <div style={{ fontSize: 13, color: '#A8A8A8', lineHeight: 1.4, marginBottom: 14 }}>
-            Connect your calendar or email so Uber AI can detect upcoming trips and pre-book all your ground transport.
-          </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={openSheet} style={{
-              flex: 1, background: COLORS.blue, color: '#fff', border: 'none',
-              borderRadius: 10, padding: '11px 12px', fontFamily: FONT, fontSize: 13.5,
-              fontWeight: 700, cursor: 'pointer',
-            }}>Enable now</button>
-            <button onClick={goManual} style={{
-              flex: 1, background: 'transparent', color: '#fff',
-              border: '1px solid rgba(255,255,255,0.3)', borderRadius: 10,
-              padding: '11px 12px', fontFamily: FONT, fontSize: 13.5,
-              fontWeight: 700, cursor: 'pointer',
-            }}>Enter trip manually</button>
+      {/* Demo toggle — interview helper, flips banner state live */}
+      <div style={{ padding: '12px 16px 0', display: 'flex', justifyContent: 'flex-end' }}>
+        <button onClick={toggle} title="Demo toggle: simulate calendar connected vs skipped" style={{
+          display: 'inline-flex', alignItems: 'center', gap: 6,
+          padding: '5px 10px', borderRadius: 999, fontFamily: FONT,
+          fontSize: 10.5, fontWeight: 700, letterSpacing: 0.3,
+          background: connected ? '#ECFDF5' : '#F3F4F6',
+          color: connected ? '#065F46' : COLORS.gray700,
+          border: `1px dashed ${connected ? '#10B981' : '#D1D5DB'}`,
+          cursor: 'pointer', textTransform: 'uppercase',
+        }}>
+          <span style={{ width: 6, height: 6, borderRadius: 3, background: connected ? '#10B981' : COLORS.gray400 }}/>
+          Calendar {connected ? 'connected' : 'skipped'}
+        </button>
+      </div>
+
+      {connected ? (
+        /* Connected state — subtle confirmation chip, no enable prompt */
+        <div style={{ padding: '10px 16px 0' }}>
+          <div style={{
+            background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: 14,
+            padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 12,
+            fontFamily: FONT,
+          }}>
+            <div style={{
+              width: 36, height: 36, borderRadius: 18, background: '#10B981',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            }}>
+              <svg width="18" height="18" viewBox="0 0 18 18"><path d="M4 9.5l3 3 7-7" stroke="#fff" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 14, fontWeight: 800, color: '#065F46', letterSpacing: -0.2 }}>
+                Calendar connected
+              </div>
+              <div style={{ fontSize: 12.5, color: '#047857', marginTop: 2, lineHeight: 1.35 }}>
+                Uber AI is monitoring for upcoming trips. We'll notify you when one's detected.
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        /* Skipped state — educational "Enable now" banner */
+        <div style={{ padding: '10px 16px 0' }}>
+          <div style={{ background: '#000', borderRadius: 16, padding: 18, color: '#fff', fontFamily: FONT }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+              <div style={{ width: 8, height: 8, borderRadius: 4, background: COLORS.green, boxShadow: `0 0 0 3px ${COLORS.green}33` }}/>
+              <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.5, textTransform: 'uppercase', color: '#CFE9DE' }}>New — Uber Business Travel AI</span>
+            </div>
+            <div style={{ fontSize: 19, fontWeight: 800, lineHeight: 1.2, letterSpacing: -0.4, marginBottom: 8 }}>
+              Let Uber plan your next business trip automatically
+            </div>
+            <div style={{ fontSize: 13, color: '#A8A8A8', lineHeight: 1.4, marginBottom: 14 }}>
+              Connect your calendar so Uber AI can detect upcoming trips and pre-book all your ground transport.
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={openSheet} style={{
+                flex: 1, background: COLORS.blue, color: '#fff', border: 'none',
+                borderRadius: 10, padding: '11px 12px', fontFamily: FONT, fontSize: 13.5,
+                fontWeight: 700, cursor: 'pointer',
+              }}>Enable now</button>
+              <button onClick={goManual} style={{
+                flex: 1, background: 'transparent', color: '#fff',
+                border: '1px solid rgba(255,255,255,0.3)', borderRadius: 10,
+                padding: '11px 12px', fontFamily: FONT, fontSize: 13.5,
+                fontWeight: 700, cursor: 'pointer',
+              }}>Enter trip manually</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Company */}
       <div style={{ padding: '22px 24px 6px', display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -532,6 +764,35 @@ function Screen3({ go, openSheet, goManual }) {
           </div>
         ))}
       </div>
+
+      {/* AI travel planning — new feature section */}
+      <div style={{ padding: '4px 24px 28px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+          <div style={{ fontFamily: FONT, fontSize: 17, fontWeight: 800, letterSpacing: -0.3 }}>AI travel planning</div>
+          <span style={{
+            fontFamily: FONT, fontSize: 9.5, fontWeight: 800, letterSpacing: 0.6,
+            color: '#fff', background: COLORS.green, padding: '3px 7px', borderRadius: 6,
+            textTransform: 'uppercase',
+          }}>New</span>
+        </div>
+        {[
+          { title: 'Auto-detect trips', body: 'Pulls flights, hotels, and meetings from your calendar.', icon: 'magic' },
+          { title: 'Door-to-door planning', body: 'Every ride, timed and ready — airport to hotel to meetings.', icon: 'route' },
+          { title: 'Real-time adjustments', body: 'Adapts to flight delays, traffic, and last-minute changes.', icon: 'live' },
+        ].map((b, i) => (
+          <div key={i} style={{ display: 'flex', gap: 14, padding: '12px 0', borderBottom: i < 2 ? `0.5px solid ${COLORS.gray100}` : 'none' }}>
+            <div style={{ width: 36, height: 36, borderRadius: 8, background: COLORS.gray50, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              {b.icon === 'magic' && <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 2v3M10 15v3M2 10h3M15 10h3M4.5 4.5l2 2M13.5 13.5l2 2M4.5 15.5l2-2M13.5 6.5l2-2" stroke="#000" strokeWidth="1.5" strokeLinecap="round"/><circle cx="10" cy="10" r="2.5" fill="#000"/></svg>}
+              {b.icon === 'route' && <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="4" cy="5" r="2" stroke="#000" strokeWidth="1.5"/><circle cx="16" cy="15" r="2" stroke="#000" strokeWidth="1.5"/><path d="M4 7v3a3 3 0 003 3h6a3 3 0 003-3" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2"/></svg>}
+              {b.icon === 'live' && <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7.5" stroke="#000" strokeWidth="1.5"/><path d="M10 6v4l2.5 2.5" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: FONT, fontSize: 14.5, fontWeight: 700 }}>{b.title}</div>
+              <div style={{ fontFamily: FONT, fontSize: 12.5, color: COLORS.gray500, marginTop: 2 }}>{b.body}</div>
+            </div>
+          </div>
+        ))}
+      </div>
     </ScreenShell>
   );
 }
@@ -540,9 +801,9 @@ function Screen3({ go, openSheet, goManual }) {
 function EnableSheet({ close, go }) {
   const [selected, setSelected] = React.useState(0);
   const opts = [
-    { title: 'Connect Google Calendar', sub: 'Read-only · recommended', icon: 'gcal' },
-    { title: 'Connect Outlook Calendar', sub: 'For Microsoft 365 users', icon: 'outlook' },
-    { title: 'Forward confirmation emails', sub: 'trips@uber.com', icon: 'forward' },
+    { title: 'Continue with Gmail', sub: 'Google Calendar · Google Workspace', icon: 'gmail' },
+    { title: 'Continue with Outlook', sub: 'Microsoft 365 · Exchange Online', icon: 'outlook' },
+    { title: 'Continue with iCloud', sub: 'Apple Calendar · iCloud.com', icon: 'icloud' },
     { title: 'Enter manually', sub: 'Type or photograph itinerary', icon: 'edit' },
   ];
   return (
@@ -897,8 +1158,8 @@ function Screen6({ goApprove, goDelay, back }) {
           </div>
         </div>
         <div style={{ marginTop: 18, fontFamily: FONT, fontSize: 10.5, fontWeight: 700, letterSpacing: 1.4, color: '#A8A8A8', textTransform: 'uppercase' }}>Door-to-door plan</div>
-        <div style={{ fontFamily: FONT, fontSize: 30, fontWeight: 800, letterSpacing: -0.6, lineHeight: 1.08, marginTop: 6 }}>San Jose Trip</div>
-        <div style={{ fontFamily: FONT, fontSize: 13.5, color: '#A8A8A8', marginTop: 8 }}>May 4–16 · 6 rides · 2 meal prompts</div>
+        <div style={{ fontFamily: FONT, fontSize: 30, fontWeight: 800, letterSpacing: -0.6, lineHeight: 1.08, marginTop: 6 }}>Trip to San Jose</div>
+        <div style={{ fontFamily: FONT, fontSize: 13.5, color: '#A8A8A8', marginTop: 8 }}>May 4–6 · 6 rides · 2 meal prompts</div>
       </div>
 
       {/* days */}
@@ -915,7 +1176,7 @@ function Screen6({ goApprove, goDelay, back }) {
         <TripLeg type="rideGray" title="End of day → Hotel" meta="Based on 6pm calendar block" tag="Flexible" last/>
       </DaySection>
 
-      <DaySection label="WED MAY 16 — RETURN DAY">
+      <DaySection label="WED MAY 6 — RETURN DAY">
         <TripLeg type="warn" title="Marriott → SJC Airport" meta="3:45 PM · Flight at 6:00 PM" detail="▲ Peak traffic · Avg TSA Wait Time ~27 min · Allow 55 min total" tag="Pre-booked"/>
         <TripLeg type="flight" title="AS408: SJC → SEA" meta="6:00 PM → 8:15 PM" tag="Monitoring"/>
         <TripLeg type="ride" title="SEA Airport → Home" meta="~8:40 PM · evening" tag="Pre-booked" last/>
@@ -1204,7 +1465,7 @@ const DAY_DATA = {
     prompt: {
       title: 'Dinner tonight?',
       badge: 'Uber',
-      body: 'Your last meeting ends at 6:45 PM. Explore top-rated spots near Salesforce Tower — we\'ll pre-book your ride as soon as you pick one.',
+      body: 'Your last meeting ends at 6:45 PM. Explore top-rated restaurants near Salesforce Tower — we\'ll pre-book your ride as soon as you pick a spot.',
       cta: 'Explore restaurants',
       confirm: 'Top picks ready',
       confirmDetail: 'Choose a spot and we\'ll book your pickup from Salesforce Tower. Uber AI will learn your taste with each trip.',
@@ -1509,7 +1770,7 @@ function Notification({ go }) {
       width: '100%', height: '100%', border: 'none', padding: 0, background: 'none', cursor: 'pointer',
       display: 'block',
     }}>
-      <img src="assets/notifciation-lockscreen.png" alt="Notification" style={{
+      <img src="assets/Image -23.png" alt="Notification" style={{
         width: '100%', height: '100%', objectFit: 'cover', display: 'block',
       }}/>
     </button>
@@ -1771,6 +2032,6 @@ function AuthWelcomeBack({ back, go }) {
 Object.assign(window, {
   Screen1, Screen2, Screen3, Screen4, Screen5, Screen6, Screen7, Screen8, Screen9,
   AuthPhone, AuthSMS, AuthName, AuthWelcomeBack, Notification, TripDetected,
-  CalendarScanning, Screen2EventsPreview,
+  CalendarScanning, Screen2EventsPreview, CalendarPermission, CalendarOAuth,
   EnableSheet, ManualForm, COLORS, FONT,
 });
