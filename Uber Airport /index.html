@@ -826,8 +826,12 @@ const SCREENS = [
 const DEFAULT_FLIGHT = MOCK_FLIGHTS['DL458'];
 
 const App = () => {
-  const [screen, setScreen] = useState('ride');
-  const [flight, setFlight] = useState(null);
+  const initialFromHash = (() => {
+    const h = (typeof window !== 'undefined' ? window.location.hash : '').replace('#', '');
+    return SCREENS.find(s => s.id === h)?.id || 'ride';
+  })();
+  const [screen, setScreen] = useState(initialFromHash);
+  const [flight, setFlight] = useState(initialFromHash !== 'ride' && initialFromHash !== 'add' ? DEFAULT_FLIGHT : null);
 
   const idx = SCREENS.findIndex(s => s.id === screen);
 
