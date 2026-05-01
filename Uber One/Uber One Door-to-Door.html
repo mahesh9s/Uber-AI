@@ -6104,13 +6104,24 @@ function PhoneFrame({ children, time = '7:55', dark = false }) {
 function App() {
   const persona = 'uberone';
   const [step, setStep] = React.useState(() => {
+    // ?step=N URL override (used for headless screenshot capture)
+    const u = new URLSearchParams(window.location.search);
+    const urlStep = +u.get('step');
+    if (!isNaN(urlStep) && urlStep >= 0) return urlStep;
     const s = +localStorage.getItem('uber_one_step');
     return isNaN(s) || s < 0 ? 0 : s;
   });
   const [sheetOpen, setSheetOpen] = React.useState(false);
   const [manual, setManual] = React.useState(false);
   const [calendarSource, setCalendarSource] = React.useState('gmail');
-  const [calendarConnected, setCalendarConnected] = React.useState(false);
+  const [calendarConnected, setCalendarConnected] = React.useState(() => {
+    // ?ai=on / ?ai=off URL override (used for screenshot capture)
+    const u = new URLSearchParams(window.location.search);
+    const ai = u.get('ai');
+    if (ai === 'on') return true;
+    if (ai === 'off') return false;
+    return false;
+  });
 
   const sequence = SEQUENCES[persona];
   const clampedStep = Math.min(step, sequence.length - 1);
