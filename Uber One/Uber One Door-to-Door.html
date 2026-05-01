@@ -6042,21 +6042,17 @@ ReactDOM.createRoot(document.getElementById('root')).render(/*#__PURE__*/React.c
 <script type="text/babel" data-plugins="transform-react-jsx-source" data-filename="inline-1">
 const SEQUENCES = {
   uberone: [
-    { key: 'invite', label: '1. Invite' },
-    { key: 'authPhone', label: '2. Phone' },
-    { key: 'welcomeBack', label: '3. Welcome back' },
-    { key: 'calendar', label: '4. Calendar' },
-    { key: 'calendarPermission', label: '4a. Permission' },
-    { key: 'calendarOAuth', label: '4b. Connect' },
-    { key: 'businessHub', label: '5. Home' },
-    { key: 'notification', label: '6. Notification' },
-    { key: 'tripDetected', label: '7. New Trip Detected' },
-    { key: 'tripFound', label: '8. Trip Found' },
-    { key: 'building', label: '9. Building' },
-    { key: 'plan', label: '10. Plan' },
-    { key: 'delay', label: '11. Delay' },
-    { key: 'confirmed', label: '12. Confirmed' },
-    { key: 'morningOf', label: '13. Morning Of' },
+    { key: 'authPhone', label: '1. Phone' },
+    { key: 'welcomeBack', label: '2. Welcome back' },
+    { key: 'calendar', label: '3. Calendar' },
+    { key: 'calendarPermission', label: '3a. Permission' },
+    { key: 'calendarOAuth', label: '3b. Connect' },
+    { key: 'businessHub', label: '4. Home' },
+    { key: 'tripDetected', label: '5. New Trip Detected' },
+    { key: 'building', label: '6. Building' },
+    { key: 'plan', label: '7. Plan' },
+    { key: 'confirmed', label: '8. Confirmed' },
+    { key: 'morningOf', label: '9. Morning Of' },
   ],
 };
 
@@ -6064,7 +6060,7 @@ const PERSONA_META = {
   uberone: { title: 'Uber One member', full: 'Uber One subscriber · Paris trip detected' },
 };
 
-const DARK_KEYS = new Set(['tripFound', 'plan', 'morningOf']);
+const DARK_KEYS = new Set(['plan', 'morningOf']);
 
 function PhoneFrame({ children, time = '7:55', dark = false }) {
   return (
@@ -6134,7 +6130,7 @@ function App() {
 
   let content;
   if (manual) {
-    content = <ManualForm back={() => setManual(false)} go={() => { setManual(false); goToKey('tripFound'); }}/>;
+    content = <ManualForm back={() => setManual(false)} go={() => { setManual(false); goToKey('building'); }}/>;
   } else {
     switch (current.key) {
       case 'invite': content = <Screen1 go={goNext}/>; break;
@@ -6145,13 +6141,10 @@ function App() {
       case 'calendar': content = <Screen2 goToPermission={() => goToKey('calendarPermission')} goToOAuth={() => goToKey('calendarOAuth')} skip={() => goToKey('businessHub')} back={goBack}/>; break;
       case 'calendarPermission': content = <CalendarPermission onAllow={() => { setCalendarSource('ios'); setCalendarConnected(true); goToKey('businessHub'); }} onDeny={() => {}} onSkip={() => { setCalendarConnected(false); goToKey('businessHub'); }} back={goBack}/>; break;
       case 'calendarOAuth': content = <CalendarOAuth goToScanning={(source) => { setCalendarSource(source); setCalendarConnected(true); goToKey('businessHub'); }} back={goBack}/>; break;
-      case 'businessHub': content = <Screen3 go={() => goToKey('notification')} openSheet={() => setSheetOpen(true)} goManual={() => setManual(true)} calendarConnected={calendarConnected} setCalendarConnected={setCalendarConnected}/>; break;
-      case 'notification': content = <Notification go={() => goToKey('tripDetected')}/>; break;
-      case 'tripDetected': content = <TripDetected go={() => goToKey('tripFound')} calendarSource={calendarSource}/>; break;
-      case 'tripFound': content = <Screen4 go={goNext} back={goBack}/>; break;
-      case 'building': content = <Screen5 go={goNext}/>; break;
-      case 'plan': content = <Screen6 goApprove={() => goToKey('confirmed')} goDelay={() => goToKey('delay')} back={() => goToKey('tripFound')}/>; break;
-      case 'delay': content = <Screen7 back={() => goToKey('plan')}/>; break;
+      case 'businessHub': content = <Screen3 go={() => goToKey('tripDetected')} openSheet={() => setSheetOpen(true)} goManual={() => setManual(true)} calendarConnected={calendarConnected} setCalendarConnected={setCalendarConnected}/>; break;
+      case 'tripDetected': content = <TripDetected go={() => goToKey('building')} calendarSource={calendarSource}/>; break;
+      case 'building': content = <Screen5 go={() => goToKey('plan')}/>; break;
+      case 'plan': content = <Screen6 goApprove={() => goToKey('confirmed')} back={() => goToKey('tripDetected')}/>; break;
       case 'confirmed': content = <Screen8 go={goNext}/>; break;
       case 'morningOf': content = <Screen9/>; break;
       default: content = null;
@@ -6180,24 +6173,62 @@ function App() {
             close={() => setSheetOpen(false)}
             goToCalendar={() => { setSheetOpen(false); goToKey('calendar'); }}
             goToManual={() => { setSheetOpen(false); setManual(true); }}
-            go={() => { setSheetOpen(false); goToKey('tripFound'); }}
+            go={() => { setSheetOpen(false); goToKey('building'); }}
           />}
         </PhoneFrame>
       </div>
 
-      {/* Nav dots */}
-      <div style={{ marginTop: 24, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center', maxWidth: 420 }}>
-        {sequence.map((_, i) => {
-          const active = clampedStep === i;
-          return (
-            <button key={i} onClick={() => goToStep(i)} style={{
-              width: active ? 28 : 9, height: 9, borderRadius: 5,
-              background: active ? '#000' : '#C7C7C9', border: 'none',
-              cursor: 'pointer', transition: 'all 0.25s cubic-bezier(.2,.8,.2,1)',
-              padding: 0,
-            }} aria-label={`Step ${i+1}`}/>
-          );
-        })}
+      {/* Nav dots with left/right arrow controls */}
+      <div style={{ marginTop: 24, display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'center', maxWidth: 460 }}>
+        <button
+          onClick={goBack}
+          disabled={clampedStep === 0}
+          aria-label="Previous step"
+          style={{
+            width: 32, height: 32, borderRadius: 16, border: 'none',
+            background: clampedStep === 0 ? '#F3F4F6' : '#000',
+            color: '#fff', cursor: clampedStep === 0 ? 'default' : 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            opacity: clampedStep === 0 ? 0.4 : 1,
+            transition: 'all 0.18s ease', flexShrink: 0,
+          }}
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M7.5 2.5L4 6l3.5 3.5" stroke={clampedStep === 0 ? '#9B9B9B' : '#fff'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+          {sequence.map((_, i) => {
+            const active = clampedStep === i;
+            return (
+              <button key={i} onClick={() => goToStep(i)} style={{
+                width: active ? 28 : 9, height: 9, borderRadius: 5,
+                background: active ? '#000' : '#C7C7C9', border: 'none',
+                cursor: 'pointer', transition: 'all 0.25s cubic-bezier(.2,.8,.2,1)',
+                padding: 0,
+              }} aria-label={`Step ${i+1}`}/>
+            );
+          })}
+        </div>
+
+        <button
+          onClick={goNext}
+          disabled={clampedStep === sequence.length - 1}
+          aria-label="Next step"
+          style={{
+            width: 32, height: 32, borderRadius: 16, border: 'none',
+            background: clampedStep === sequence.length - 1 ? '#F3F4F6' : '#000',
+            color: '#fff', cursor: clampedStep === sequence.length - 1 ? 'default' : 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            opacity: clampedStep === sequence.length - 1 ? 0.4 : 1,
+            transition: 'all 0.18s ease', flexShrink: 0,
+          }}
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M4.5 2.5L8 6l-3.5 3.5" stroke={clampedStep === sequence.length - 1 ? '#9B9B9B' : '#fff'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
       </div>
       <div style={{ marginTop: 12, fontFamily: 'DM Sans, system-ui', fontSize: 13, fontWeight: 600, color: '#3D3D3D', letterSpacing: -0.1, textAlign: 'center' }}>
         {current.label}

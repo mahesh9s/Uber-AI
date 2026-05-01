@@ -25,22 +25,22 @@ const FONT = "'DM Sans', -apple-system, 'Segoe UI', system-ui, sans-serif";
 // ─────────────────────────────────────────────────────────────
 const MOCK_CALENDAR_EVENTS = {
   flights: [
-    { type: 'flight', airline: 'Delta', number: 'DL120', date: 'May 8', time: '5:30 PM', from: 'JFK', to: 'CDG', detected: true, source: 'Delta' },
-    { type: 'flight', airline: 'Delta', number: 'DL121', date: 'May 10', time: '1:45 PM', from: 'CDG', to: 'JFK', detected: true, source: 'Delta' },
+    { type: 'flight', airline: 'British Airways', number: 'BA178', date: 'May 8', time: '11:00 AM', from: 'JFK', to: 'LHR', detected: true, source: 'British Airways' },
+    { type: 'flight', airline: 'British Airways', number: 'BA177', date: 'May 12', time: '6:30 PM', from: 'LHR', to: 'JFK', detected: true, source: 'British Airways' },
   ],
   hotel: {
     type: 'hotel',
-    name: 'Hôtel des Grands Boulevards',
+    name: 'The Hoxton, Holborn',
     checkIn: 'May 8',
-    checkOut: 'May 10',
-    address: '17 Boulevard Poissonnière, Paris',
+    checkOut: 'May 12',
+    address: '199-206 High Holborn, London WC1V 7BD',
     detected: true,
     source: 'Booking.com',
   },
   activities: [
-    { type: 'activity', title: 'Louvre Museum', date: 'May 9', time: '10:00 AM', location: 'Rue de Rivoli, 75001 Paris', detected: true, source: 'Viator' },
-    { type: 'activity', title: 'Eiffel Tower — Summit Access', date: 'May 9', time: '2:30 PM', location: 'Champ de Mars, Paris', detected: true, source: 'Viator' },
-    { type: 'activity', title: 'Dinner — Bistrot Paul Bert', date: 'May 9', time: '7:15 PM', location: '18 Rue Paul Bert, 75011 Paris', detected: true, source: 'OpenTable' },
+    { type: 'activity', title: 'Tower of London', date: 'May 9', time: '10:00 AM', location: 'Tower Hill, London EC3N 4AB', detected: true, source: 'Viator' },
+    { type: 'activity', title: 'The London Eye', date: 'May 10', time: '2:30 PM', location: 'Riverside Building, London SE1 7PB', detected: true, source: 'Viator' },
+    { type: 'activity', title: 'Dinner — Dishoom Covent Garden', date: 'May 9', time: '7:30 PM', location: '12 Upper St Martin\'s Lane, London WC2H 9FB', detected: true, source: 'OpenTable' },
   ],
 };
 
@@ -161,7 +161,7 @@ function Screen2EventsPreview({ go, calendarSource = 'Gmail' }) {
     MOCK_CALENDAR_EVENTS.hotel,
     ...(MOCK_CALENDAR_EVENTS.activities || MOCK_CALENDAR_EVENTS.meetings || []),
   ].sort((a, b) => {
-    const dateOrder = { 'May 8': 0, 'May 9': 1, 'May 10': 2 };
+    const dateOrder = { 'May 8': 0, 'May 9': 1, 'May 10': 2, 'May 11': 3, 'May 12': 4 };
     const dateA = dateOrder[a.date] ?? 0;
     const dateB = dateOrder[b.date] ?? 0;
     return dateA - dateB;
@@ -700,10 +700,10 @@ function Screen3({ go, openSheet, goManual, calendarConnected, setCalendarConnec
               </div>
 
               <div style={{ fontSize: 19, fontWeight: 800, lineHeight: 1.2, letterSpacing: -0.4, marginBottom: 6 }}>
-                Trip to Paris detected
+                Trip to London detected
               </div>
               <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', marginBottom: 14, lineHeight: 1.4 }}>
-                Fri May 8 → Sun May 10 · 5 rides planned · Louvre, Eiffel Tower, dinner reservation
+                Fri May 8 → Tue May 12 · 5 days · Tower of London, London Eye, dinner reservation
               </div>
 
               <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
@@ -712,7 +712,7 @@ function Screen3({ go, openSheet, goManual, calendarConnected, setCalendarConnec
                   padding: '10px 16px', borderRadius: 10, fontFamily: FONT,
                   fontSize: 13, fontWeight: 800, cursor: 'pointer', letterSpacing: -0.1,
                 }}>
-                  Review plan →
+                  Review guide →
                 </button>
                 <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>Read from Viator · OpenTable · Booking.com</span>
               </div>
@@ -1082,10 +1082,10 @@ function ManualForm({ back, go }) {
       </div>
       <div style={{ padding: '10px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
         {[
-          { label: 'Destination city', value: 'Paris, France' },
-          { label: 'Travel dates', value: 'May 8–10, 2026' },
-          { label: 'Flight number (optional)', value: 'DL120' },
-          { label: 'Hotel name (optional)', value: 'Hôtel des Grands Boulevards' },
+          { label: 'Destination city', value: 'London, UK' },
+          { label: 'Travel dates', value: 'May 8–12, 2026' },
+          { label: 'Flight number (optional)', value: 'BA178' },
+          { label: 'Hotel name (optional)', value: 'The Hoxton, Holborn' },
         ].map((f, i) => (
           <div key={i} style={{ border: `1px solid ${COLORS.gray200}`, borderRadius: 12, padding: '12px 14px' }}>
             <div style={{ fontFamily: FONT, fontSize: 11.5, fontWeight: 600, color: COLORS.gray500, textTransform: 'uppercase', letterSpacing: 0.4 }}>{f.label}</div>
@@ -1111,9 +1111,9 @@ function ManualForm({ back, go }) {
 // ─────────────────────────────────────────────────────────────
 function Screen4({ go, back }) {
   const [fields, setFields] = React.useState([
-    { icon: 'plane', label: 'Outbound flight', value: 'DL120 · Fri May 8 · JFK → CDG · 5:30 PM' },
-    { icon: 'bed',   label: 'Hotel',  value: 'Hôtel des Grands Boulevards · 2 nights' },
-    { icon: 'plane', label: 'Return flight', value: 'DL121 · Sun May 10 · CDG → JFK · 1:45 PM' },
+    { icon: 'plane', label: 'Outbound flight', value: 'BA178 · Fri May 8 · JFK → LHR · 11:00 AM' },
+    { icon: 'bed',   label: 'Hotel',  value: 'The Hoxton, Holborn · 4 nights' },
+    { icon: 'plane', label: 'Return flight', value: 'BA177 · Tue May 12 · LHR → JFK · 6:30 PM' },
   ]);
   const [editing, setEditing] = React.useState(null); // index being edited
   const [draft, setDraft] = React.useState('');
@@ -1122,10 +1122,10 @@ function Screen4({ go, back }) {
   const [addValue, setAddValue] = React.useState('');
 
   const ADD_TYPES = [
-    { key: 'meeting', label: 'Activity', placeholder: 'e.g. Seine Cruise · Sat 5pm', icon: 'cal' },
-    { key: 'flight',  label: 'Flight',  placeholder: 'e.g. AF123 · May 8, 5:30 PM → 7:00 AM', icon: 'plane' },
-    { key: 'hotel',   label: 'Hotel',   placeholder: 'e.g. Hôtel Plaza Athénée', icon: 'bed' },
-    { key: 'location',label: 'Reservation',placeholder: 'e.g. Dinner at Le Comptoir, 8pm', icon: 'pin' },
+    { key: 'meeting', label: 'Activity', placeholder: 'e.g. Sky Garden visit · Sun 4pm', icon: 'cal' },
+    { key: 'flight',  label: 'Flight',  placeholder: 'e.g. BA289 · May 9, 8:00 AM LHR → EDI', icon: 'plane' },
+    { key: 'hotel',   label: 'Hotel',   placeholder: 'e.g. The Savoy · 1 night', icon: 'bed' },
+    { key: 'location',label: 'Reservation',placeholder: 'e.g. Tea at The Wolseley · 3pm', icon: 'pin' },
   ];
 
   const confirmAdd = () => {
@@ -1168,12 +1168,12 @@ function Screen4({ go, back }) {
           <div style={{ width: 6, height: 6, borderRadius: 3, background: COLORS.green }}/>
           Uber AI · Trip detected
         </div>
-        <div style={{ fontFamily: FONT, fontSize: 36, fontWeight: 800, letterSpacing: -0.8, lineHeight: 1.05, marginTop: 8 }}>Paris,<br/>France 🇫🇷</div>
-        <div style={{ fontFamily: FONT, fontSize: 14, color: '#A8A8A8', marginTop: 10 }}>Fri May 8 → Sun May 10 · 3 days · couple</div>
+        <div style={{ fontFamily: FONT, fontSize: 36, fontWeight: 800, letterSpacing: -0.8, lineHeight: 1.05, marginTop: 8 }}>London,<br/>UK 🇬🇧</div>
+        <div style={{ fontFamily: FONT, fontSize: 14, color: '#A8A8A8', marginTop: 10 }}>Fri May 8 → Tue May 12 · 5 days · couple</div>
       </div>
 
       <div style={{ padding: '24px 24px 10px' }}>
-        <h2 style={{ fontFamily: FONT, fontSize: 22, fontWeight: 800, letterSpacing: -0.5, lineHeight: 1.18, margin: 0 }}>Your Paris weekend, planned door to door</h2>
+        <h2 style={{ fontFamily: FONT, fontSize: 22, fontWeight: 800, letterSpacing: -0.5, lineHeight: 1.18, margin: 0 }}>Your London trip, planned door to door</h2>
         <p style={{ fontFamily: FONT, fontSize: 14, color: COLORS.gray500, lineHeight: 1.45, marginTop: 10 }}>
           We pulled your flights, hotel, and activities from your calendar. Let Uber AI handle every ride between them — so you can focus on the trip, not the logistics.
         </p>
@@ -1312,10 +1312,10 @@ function Screen4({ go, back }) {
           }}>📅</div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontFamily: FONT, fontSize: 13.5, fontWeight: 800, letterSpacing: -0.2 }}>
-              Day 2 plan: 3 activities
+              Day 2 plan: Tower of London + dinner
             </div>
             <div style={{ fontFamily: FONT, fontSize: 12, color: '#A8A8A8', marginTop: 2, lineHeight: 1.4 }}>
-              Louvre · Eiffel Tower · Bistrot Paul Bert — scheduled in your daily plan
+              Tower of London · London Eye · Dishoom — scheduled in your daily plan
             </div>
           </div>
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0, opacity: 0.7 }}>
@@ -1342,10 +1342,10 @@ function Screen5({ go }) {
   }, []);
   const steps = [
     { type: 'gray', text: 'Reading your calendar...' },
-    { type: 'check', text: 'Found flight DL120 to Paris (CDG)' },
-    { type: 'check', text: 'Found Hôtel des Grands Boulevards' },
-    { type: 'check', text: 'Detected Louvre, Eiffel Tower, dinner reservation' },
-    { type: 'arrow', text: 'Building your door-to-door plan...' },
+    { type: 'check', text: 'Found flight BA178 to London (LHR)' },
+    { type: 'check', text: 'Found The Hoxton, Holborn' },
+    { type: 'check', text: 'Detected Tower of London, London Eye, dinner reservation' },
+    { type: 'arrow', text: 'Building your London guide...' },
   ];
   return (
     <ScreenShell>
@@ -1356,8 +1356,8 @@ function Screen5({ go }) {
           borderTopColor: '#000',
           animation: 'spin 0.9s linear infinite',
         }}/>
-        <div style={{ fontFamily: FONT, fontSize: 26, fontWeight: 800, letterSpacing: -0.6, marginTop: 26, textAlign: 'center' }}>Building your plan</div>
-        <div style={{ fontFamily: FONT, fontSize: 14, color: COLORS.gray500, marginTop: 8, textAlign: 'center' }}>Uber AI is analyzing your trip...</div>
+        <div style={{ fontFamily: FONT, fontSize: 26, fontWeight: 800, letterSpacing: -0.6, marginTop: 26, textAlign: 'center' }}>Building your guide</div>
+        <div style={{ fontFamily: FONT, fontSize: 14, color: COLORS.gray500, marginTop: 8, textAlign: 'center' }}>Uber AI is mapping your London trip...</div>
 
         <div style={{ width: '100%', marginTop: 40, display: 'flex', flexDirection: 'column', gap: 14 }}>
           {steps.map((s, i) => (
@@ -1390,10 +1390,7 @@ function Screen5({ go }) {
 function Screen6({ goApprove, goDelay, back }) {
   return (
     <ScreenShell stickyBottom={
-      <>
-        <BlackButton onClick={goApprove}>Approve all rides →</BlackButton>
-        <GhostText onClick={goDelay} style={{ paddingBottom: 0 }}>Preview flight delay scenario</GhostText>
-      </>
+      <BlackButton onClick={goApprove}>Save my London guide →</BlackButton>
     }>
       {/* dark header */}
       <div style={{ background: '#000', color: '#fff', padding: '58px 20px 22px', position: 'relative' }}>
@@ -1409,32 +1406,48 @@ function Screen6({ goApprove, goDelay, back }) {
             AI Built
           </div>
         </div>
-        <div style={{ marginTop: 18, fontFamily: FONT, fontSize: 10.5, fontWeight: 700, letterSpacing: 1.4, color: '#A8A8A8', textTransform: 'uppercase' }}>Door-to-door plan</div>
-        <div style={{ fontFamily: FONT, fontSize: 30, fontWeight: 800, letterSpacing: -0.6, lineHeight: 1.08, marginTop: 6 }}>Trip to Paris 🇫🇷</div>
-        <div style={{ fontFamily: FONT, fontSize: 13.5, color: '#A8A8A8', marginTop: 8 }}>May 8–10 · 6 rides · couple</div>
+        <div style={{ marginTop: 18, fontFamily: FONT, fontSize: 10.5, fontWeight: 700, letterSpacing: 1.4, color: '#A8A8A8', textTransform: 'uppercase' }}>Your London guide</div>
+        <div style={{ fontFamily: FONT, fontSize: 30, fontWeight: 800, letterSpacing: -0.6, lineHeight: 1.08, marginTop: 6 }}>Trip to London 🇬🇧</div>
+        <div style={{ fontFamily: FONT, fontSize: 13.5, color: '#A8A8A8', marginTop: 8 }}>May 8–12 · 5 days · tap any day to expand</div>
       </div>
 
       {/* Day 1 — Travel out */}
-      <DaySection label="FRI MAY 8 — DEPARTURE">
-        <TripLeg type="ride" title="Home → JFK Airport" meta="2:30 PM · UberX" detail="TSA Wait Time ~12 min · Terminal 4 · Flight delays monitored" tag="Reserve"/>
-        <TripLeg type="flight" title="DL120: JFK → CDG" meta="5:30 PM → 7:00 AM (next day)" detail="Real-time delay monitoring active" tag="Monitoring"/>
-        <TripLeg type="ride" title="CDG Airport → Hôtel des Grands Boulevards" meta="Pickup ~7:35 AM" detail="Driver positioned before you land · No need to wait" tag="Reserve" last/>
+      <DaySection label="FRI MAY 8 — DEPARTURE" summary="Travel day · 3 ride suggestions">
+        <TripLeg type="ride" title="Home → JFK Airport" meta="8:00 AM · UberX suggested" detail="TSA Wait Time ~14 min · Terminal 7 · Flight delays monitored"/>
+        <TripLeg type="flight" title="BA178: JFK → LHR" meta="11:00 AM → 11:00 PM (London time)" detail="Real-time delay monitoring active · 7h flight" tag="Monitoring"/>
+        <TripLeg type="ride" title="The Hoxton, Holborn" meta="Pickup ~11:45 PM" detail="~40 min from LHR to central London · light late-night traffic" bookHint="Book when you've grabbed your bags" last/>
       </DaySection>
 
-      {/* Day 2 — Activity day */}
-      <DaySection label="SAT MAY 9 — PARIS DAY">
-        <TripLeg type="ride" title="Hotel → Louvre Museum" meta="9:30 AM · ~10 min · UberX" detail="Viator timed entry at 10:00 AM · No wait" tag="Suggested"/>
-        <TripLeg type="ride" title="Louvre → Eiffel Tower" meta="2:00 PM · ~22 min" detail="Eiffel Tower summit access at 2:30 PM · Light traffic" tag="Suggested"/>
-        <TripLeg type="ride" title="Eiffel Tower → Hotel" meta="5:30 PM · ~18 min" detail="Rest break before dinner" tag="Suggested"/>
-        <TripLeg type="warn" title="Leave at 6:50 PM for dinner reservation" meta="Hotel → Bistrot Paul Bert · 7:15 PM seating" detail="▲ Sat eve traffic · ~22 min ride · arrive 5 min early" tag="Reservation"/>
-        <TripLeg type="ride" title="Bistrot Paul Bert → Hotel" meta="9:45 PM · ~18 min" tag="Suggested" last/>
+      {/* Day 2 — Activity day 1 */}
+      <DaySection label="SAT MAY 9 — TOWER & DISHOOM" summary="5 rides · 1 dinner reservation alert">
+        <TripLeg type="ride" title="Hotel → Tower of London" meta="9:30 AM · ~12 min" detail="Viator timed entry at 10:00 AM · No queue"/>
+        <TripLeg type="ride" title="Tower of London → Borough Market" meta="1:00 PM · ~10 min" detail="Lunch break · iconic food market"/>
+        <TripLeg type="ride" title="Borough Market → Hotel" meta="3:30 PM · ~14 min" detail="Rest before dinner"/>
+        <TripLeg type="warn" title="Leave at 7:00 PM for dinner reservation" meta="Hotel → Dishoom Covent Garden · 7:30 PM seating" detail="▲ Sat eve West End traffic · ~18 min ride · arrive 5 min early" tag="Reservation"/>
+        <TripLeg type="ride" title="Dishoom → Hotel" meta="9:45 PM · ~12 min" last/>
       </DaySection>
 
-      {/* Day 3 — Return */}
-      <DaySection label="SUN MAY 10 — RETURN DAY">
-        <TripLeg type="warn" title="Hotel → CDG Airport" meta="10:30 AM · Flight at 1:45 PM" detail="▲ Sun traffic to airport · Avg TSA Wait Time ~24 min · Allow 60 min total" tag="Reserve"/>
-        <TripLeg type="flight" title="DL121: CDG → JFK" meta="1:45 PM → 4:30 PM" tag="Monitoring"/>
-        <TripLeg type="ride" title="JFK Airport → Home" meta="~5:15 PM · afternoon" tag="Reserve" last/>
+      {/* Day 3 — Activity day 2 */}
+      <DaySection label="SUN MAY 10 — LONDON EYE" summary="4 rides · British Museum + London Eye">
+        <TripLeg type="ride" title="Hotel → British Museum" meta="10:00 AM · ~6 min" detail="Free entry · self-paced morning"/>
+        <TripLeg type="ride" title="British Museum → London Eye" meta="1:30 PM · ~14 min" detail="Viator timed entry at 2:30 PM"/>
+        <TripLeg type="ride" title="London Eye → Hotel" meta="4:30 PM · ~10 min"/>
+        <TripLeg type="ride" title="Hotel → Sunday roast (Hawksmoor Seven Dials)" meta="7:00 PM · ~8 min" detail="Classic London Sunday meal" last/>
+      </DaySection>
+
+      {/* Day 4 — Activity day 3 */}
+      <DaySection label="MON MAY 11 — WESTMINSTER & TATE" summary="4 rides · Westminster + Tate Modern">
+        <TripLeg type="ride" title="Hotel → Westminster Abbey" meta="10:00 AM · ~12 min" detail="Self-paced morning visit"/>
+        <TripLeg type="ride" title="Westminster → Tate Modern" meta="1:00 PM · ~10 min" detail="Lunch en route at Borough · then museum"/>
+        <TripLeg type="ride" title="Tate Modern → Hotel" meta="5:00 PM · ~12 min"/>
+        <TripLeg type="ride" title="Hotel → Sky Garden (sunset drinks)" meta="7:30 PM · ~14 min" detail="Free observation deck · book ahead" last/>
+      </DaySection>
+
+      {/* Day 5 — Return */}
+      <DaySection label="TUE MAY 12 — RETURN DAY" summary="Return day · 3 rides · airport alert">
+        <TripLeg type="warn" title="Hotel → LHR Airport" meta="3:00 PM · Flight at 6:30 PM" detail="▲ Tue afternoon traffic to LHR · Avg security wait ~28 min · Allow 75 min total" tag="Airport alert"/>
+        <TripLeg type="flight" title="BA177: LHR → JFK" meta="6:30 PM → 9:30 PM (NYC time)" tag="Monitoring"/>
+        <TripLeg type="ride" title="JFK Airport → Home" meta="~10:15 PM · evening" bookHint="Book when you've grabbed your bags" last/>
       </DaySection>
 
       <div style={{ height: 16 }}/>
@@ -1442,27 +1455,52 @@ function Screen6({ goApprove, goDelay, back }) {
   );
 }
 
-function DaySection({ label, children }) {
+function DaySection({ label, summary, defaultOpen = false, children }) {
+  const [open, setOpen] = React.useState(defaultOpen);
   return (
-    <div style={{ padding: '20px 20px 6px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-        <div style={{ fontFamily: FONT, fontSize: 10.5, fontWeight: 800, letterSpacing: 1, color: COLORS.gray500 }}>{label}</div>
-        <div style={{ flex: 1, height: 0.5, background: COLORS.gray200 }}/>
-      </div>
-      <div>{children}</div>
+    <div style={{ padding: '14px 20px 4px' }}>
+      <button
+        onClick={() => setOpen(!open)}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+          background: 'none', border: 'none', cursor: 'pointer',
+          padding: '8px 0', textAlign: 'left',
+        }}
+      >
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontFamily: FONT, fontSize: 11, fontWeight: 800, letterSpacing: 1, color: COLORS.gray700, textTransform: 'uppercase' }}>{label}</div>
+          {!open && summary && (
+            <div style={{ fontFamily: FONT, fontSize: 12, color: COLORS.gray500, marginTop: 4, fontWeight: 500 }}>{summary}</div>
+          )}
+        </div>
+        <div style={{
+          width: 28, height: 28, borderRadius: 14, background: COLORS.gray50,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+          transition: 'transform 0.2s ease', transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+        }}>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M3 4.5l3 3 3-3" stroke="#000" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+      </button>
+      {open && (
+        <div style={{ marginTop: 12, paddingBottom: 4 }}>{children}</div>
+      )}
+      {!open && (
+        <div style={{ height: 0.5, background: COLORS.gray100, marginTop: 8 }}/>
+      )}
     </div>
   );
 }
 
-function TripLeg({ type, title, meta, detail, tag, tagOrange, last, waitSave }) {
+function TripLeg({ type, title, meta, detail, tag, tagOrange, last, waitSave, bookHint }) {
   const [editing, setEditing] = React.useState(false);
   const [metaVal, setMetaVal] = React.useState(meta);
   const [detailVal, setDetailVal] = React.useState(detail || '');
   const [waitSaveOn, setWaitSaveOn] = React.useState(false);
-  const [reserveOpen, setReserveOpen] = React.useState(false);
-  const [reserveMode, setReserveMode] = React.useState('reserve'); // 'reserve' | 'on-demand'
-  const isReserveTag = tag === 'Reserve';
-  const reserveLabel = reserveMode === 'reserve' ? 'Reserve' : 'On-demand';
+  // "Reserve" tag from old auto-booking model is now treated as a regular ride
+  // (no auto-action). Each ride card surfaces a soft "Book ride →" link instead.
+  const isBookable = (type === 'ride' || type === 'rideGray' || type === 'warn');
   const dotMeta = {
     ride:     { bg: '#000' },
     rideGray: { bg: COLORS.gray400 },
@@ -1505,7 +1543,9 @@ function TripLeg({ type, title, meta, detail, tag, tagOrange, last, waitSave }) 
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'flex-start' }}>
               <div style={{ fontFamily: FONT, fontSize: 14.5, fontWeight: 700, letterSpacing: -0.2, flex: 1 }}>{title}</div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                {tag && !isReserveTag && (
+                {/* Soft tag — only show meaningful tags (Monitoring, Reservation, Eats).
+                    "Reserve" and "Suggested" are dropped — guidance, not bookings. */}
+                {tag && tag !== 'Reserve' && tag !== 'Suggested' && (
                   <span style={{
                     fontFamily: FONT, fontSize: 10, fontWeight: 700, padding: '3px 8px',
                     borderRadius: 10, letterSpacing: 0.2,
@@ -1513,21 +1553,6 @@ function TripLeg({ type, title, meta, detail, tag, tagOrange, last, waitSave }) 
                     color: tagOrange || warn ? '#fff' : COLORS.gray700,
                     whiteSpace: 'nowrap',
                   }}>{tag}</span>
-                )}
-                {isReserveTag && (
-                  <button onClick={(e) => { e.stopPropagation(); setReserveOpen(o => !o); }} style={{
-                    fontFamily: FONT, fontSize: 10, fontWeight: 700,
-                    padding: '3px 6px 3px 8px', borderRadius: 10, letterSpacing: 0.2,
-                    background: reserveMode === 'reserve' ? '#000' : COLORS.gray100,
-                    color: reserveMode === 'reserve' ? '#fff' : COLORS.gray700,
-                    border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 3,
-                    whiteSpace: 'nowrap',
-                  }}>
-                    {reserveLabel}
-                    <svg width="9" height="9" viewBox="0 0 9 9" fill="none" style={{ transition: 'transform 0.15s', transform: reserveOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                      <path d="M2 3.5l2.5 2.5L7 3.5" stroke={reserveMode === 'reserve' ? '#fff' : COLORS.gray700} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </button>
                 )}
                 <button onClick={() => setEditing(true)} style={{
                   width: 24, height: 24, borderRadius: 6, background: COLORS.gray100,
@@ -1541,38 +1566,22 @@ function TripLeg({ type, title, meta, detail, tag, tagOrange, last, waitSave }) 
             </div>
             <div style={{ fontFamily: FONT, fontSize: 12.5, color: warn ? '#B45309' : COLORS.gray500, marginTop: 3, fontWeight: 500 }}>{metaVal}</div>
             {detailVal && <div style={{ fontFamily: FONT, fontSize: 12, color: warn ? '#B45309' : COLORS.gray500, marginTop: 5, lineHeight: 1.4 }}>{detailVal}</div>}
-            {isReserveTag && reserveOpen && (
-              <div style={{
-                marginTop: 10, padding: 4, background: COLORS.gray50,
-                borderRadius: 10, border: `1px solid ${COLORS.gray200}`,
-                display: 'flex', flexDirection: 'column', gap: 2,
-              }}>
-                {[
-                  { key: 'reserve', label: 'Reserve in advance', sub: 'Lock pricing now · ride scheduled' },
-                  { key: 'on-demand', label: 'Book on-demand', sub: 'Request when you\'re ready' },
-                ].map(opt => {
-                  const sel = reserveMode === opt.key;
-                  return (
-                    <button key={opt.key} onClick={(e) => { e.stopPropagation(); setReserveMode(opt.key); setReserveOpen(false); }} style={{
-                      width: '100%', display: 'flex', alignItems: 'center', gap: 10,
-                      padding: '9px 10px', border: 'none', background: sel ? '#fff' : 'transparent',
-                      borderRadius: 8, cursor: 'pointer', textAlign: 'left',
-                      boxShadow: sel ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
-                    }}>
-                      <div style={{
-                        width: 16, height: 16, borderRadius: 8, flexShrink: 0,
-                        border: `2px solid ${sel ? '#000' : COLORS.gray400}`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      }}>
-                        {sel && <div style={{ width: 7, height: 7, borderRadius: 4, background: '#000' }}/>}
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontFamily: FONT, fontSize: 12.5, fontWeight: 700, color: '#000' }}>{opt.label}</div>
-                        <div style={{ fontFamily: FONT, fontSize: 11, color: COLORS.gray500, marginTop: 1 }}>{opt.sub}</div>
-                      </div>
-                    </button>
-                  );
-                })}
+            {/* Soft "Book ride" link — user-initiated, no auto-action */}
+            {isBookable && (
+              <div style={{ marginTop: 10, paddingTop: 9, borderTop: `0.5px dashed ${warn ? COLORS.amberBorder : COLORS.gray200}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontFamily: FONT, fontSize: 11, color: warn ? '#B45309' : COLORS.gray500, fontWeight: 600 }}>
+                  {bookHint || "We'll notify you when to leave"}
+                </span>
+                <button onClick={(e) => e.stopPropagation()} style={{
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  fontFamily: FONT, fontSize: 12, fontWeight: 800, color: '#000',
+                  padding: '2px 0', display: 'inline-flex', alignItems: 'center', gap: 4,
+                }}>
+                  Book ride
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                    <path d="M3 2.5L6.5 5 3 7.5" stroke="#000" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
               </div>
             )}
             {waitSave && (
@@ -1644,7 +1653,7 @@ function Screen7({ back }) {
           </div>
           <div>
             <div style={{ fontFamily: FONT, fontSize: 15, fontWeight: 800, color: '#7C2D12' }}>Flight Delay Detected</div>
-            <div style={{ fontFamily: FONT, fontSize: 13, color: '#7C2D12', marginTop: 4, lineHeight: 1.4 }}>DL120 delayed 35 min. Ground transport automatically adjusted.</div>
+            <div style={{ fontFamily: FONT, fontSize: 13, color: '#7C2D12', marginTop: 4, lineHeight: 1.4 }}>BA178 delayed 35 min. Your suggested pickup time has been re-timed.</div>
           </div>
         </div>
       </div>
@@ -1652,17 +1661,17 @@ function Screen7({ back }) {
       <div style={{ padding: '16px 20px 6px', fontFamily: FONT, fontSize: 11, fontWeight: 800, letterSpacing: 1, color: COLORS.gray500, textTransform: 'uppercase' }}>What changed</div>
 
       <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <ChangeCard title="Flight DL120" oldVal="Arrives 7:00 AM" newVal="Now 7:35 AM"/>
-        <ChangeCard title="CDG Pickup" oldVal="Pickup 7:35 AM" newVal="Now 8:10 AM"/>
+        <ChangeCard title="Flight BA178" oldVal="Arrives 11:00 PM" newVal="Now 11:35 PM"/>
+        <ChangeCard title="LHR Pickup" oldVal="Pickup 11:45 PM" newVal="Now 12:20 AM"/>
         <div style={{ background: COLORS.greenBg, border: `1px solid #A7E3C4`, borderRadius: 12, padding: '14px' }}>
-          <div style={{ fontFamily: FONT, fontSize: 13.5, fontWeight: 700, color: '#065F46' }}>10:00 AM Louvre timed entry</div>
+          <div style={{ fontFamily: FONT, fontSize: 13.5, fontWeight: 700, color: '#065F46' }}>10:00 AM Tower of London timed entry (Sat)</div>
           <div style={{ fontFamily: FONT, fontSize: 12.5, color: COLORS.green, marginTop: 4, fontWeight: 600 }}>✓ Still on time — hotel check-in & ride re-routed</div>
         </div>
       </div>
 
       <div style={{ padding: '20px 20px 24px' }}>
         <div style={{ background: COLORS.gray50, borderRadius: 12, padding: '14px 16px', fontFamily: FONT, fontSize: 12.5, color: COLORS.gray700, lineHeight: 1.45 }}>
-          Driver notified automatically. We'll keep monitoring and alert you if anything else changes.
+          We'll keep monitoring and notify you if anything else changes — book your ride when you're ready.
         </div>
       </div>
     </ScreenShell>
@@ -1701,22 +1710,22 @@ function Screen8({ go }) {
         }}>
           <svg width="42" height="42" viewBox="0 0 42 42"><path d="M11 21l7 7 14-14" stroke="#fff" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
         </div>
-        <div style={{ fontFamily: FONT, fontSize: 30, fontWeight: 800, letterSpacing: -0.6, marginTop: 24, textAlign: 'center' }}>Plan confirmed</div>
+        <div style={{ fontFamily: FONT, fontSize: 30, fontWeight: 800, letterSpacing: -0.6, marginTop: 24, textAlign: 'center' }}>Your London guide is ready</div>
         <div style={{ fontFamily: FONT, fontSize: 14, color: COLORS.gray500, marginTop: 10, textAlign: 'center', lineHeight: 1.45, textWrap: 'balance' }}>
-          6 rides pre-scheduled. Flights monitored. Reservations synced. Ready when you are.
+          We'll notify you when to leave for each ride — tap to book on your terms.
         </div>
       </div>
 
       <div style={{ padding: '12px 20px 14px' }}>
         <div style={{ background: '#000', color: '#fff', borderRadius: 16, padding: 18 }}>
           <div style={{ fontFamily: FONT, fontSize: 10.5, fontWeight: 700, letterSpacing: 1.4, color: '#A8A8A8', textTransform: 'uppercase' }}>Upcoming trip</div>
-          <div style={{ fontFamily: FONT, fontSize: 20, fontWeight: 800, letterSpacing: -0.4, marginTop: 4 }}>Paris · May 8–10</div>
+          <div style={{ fontFamily: FONT, fontSize: 20, fontWeight: 800, letterSpacing: -0.4, marginTop: 4 }}>London · May 8–12</div>
           <div style={{ height: 0.5, background: 'rgba(255,255,255,0.12)', margin: '14px 0 2px' }}/>
           {[
-            { icon: 'car', text: '6 rides pre-booked across 3 days' },
-            { icon: 'plane', text: 'Flights DL120 + DL121 monitored' },
-            { icon: 'bell', text: 'Louvre, Eiffel Tower, dinner reservations synced' },
-            { icon: 'dollar', text: 'Uber One member · 10% off all rides' },
+            { icon: 'car', text: '12 ride suggestions across 5 days · book any with one tap' },
+            { icon: 'plane', text: 'Flights BA178 + BA177 monitored for delays' },
+            { icon: 'bell', text: 'Tower of London, London Eye, dinner alerts queued' },
+            { icon: 'dollar', text: 'Uber One member · 10% off when you book' },
           ].map((r, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: i < 3 ? `0.5px solid rgba(255,255,255,0.08)` : 'none' }}>
               <div style={{ width: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -1733,7 +1742,7 @@ function Screen8({ go }) {
 
       <div style={{ padding: '0 20px 24px' }}>
         <div style={{ background: COLORS.gray50, borderRadius: 12, padding: '14px 16px', fontFamily: FONT, fontSize: 12.5, color: COLORS.gray700, lineHeight: 1.45 }}>
-          Notifications sent as each leg approaches. Tap any ride to edit or cancel.
+          We'll notify you when to leave. Tap any leg to book your ride.
         </div>
       </div>
     </ScreenShell>
@@ -1747,97 +1756,120 @@ const DAY_DATA = {
   1: {
     tabLabel: 'Day 1',
     tabSub: 'Fri May 8',
-    dateLabel: 'FRI MAY 8 · 1:30 PM',
-    subtitle: 'Your Paris trip starts today 🇫🇷',
+    dateLabel: 'FRI MAY 8 · 7:00 AM',
+    subtitle: 'Your London trip starts today 🇬🇧',
     nextRide: {
-      label: 'Next ride · in 60 min',
+      label: 'Time to leave · in 60 min',
       title: 'Home → JFK Airport',
       stats: [
-        { label: 'Pickup', value: '2:30 PM', color: '#fff' },
-        { label: 'TSA Wait Time', value: '~12 min', color: '#fff' },
+        { label: 'Pickup', value: '8:00 AM', color: '#fff' },
+        { label: 'TSA Wait Time', value: '~14 min', color: '#fff' },
         { label: 'Traffic', value: 'Light', color: COLORS.green },
       ],
     },
-    prompt: {
-      title: 'Sleep mask & snacks for the flight?',
-      badge: 'Uber Eats',
-      body: 'Long-haul flight ahead. Order an Uber Eats kit (sleep mask, snacks, water) delivered to your gate before boarding — Uber One members get free delivery.',
-      cta: 'Browse travel kits',
-      confirm: 'On its way!',
-      confirmDetail: 'Delivered to JFK Terminal 4 Gate B22 by 4:45 PM · Free delivery with Uber One',
-    },
+    prompt: null,
     schedule: [
-      { dot: COLORS.green, active: true, title: 'Ride to JFK Airport', time: '2:30 PM' },
-      { dot: COLORS.gray400, title: 'Flight DL120 to Paris (CDG)', time: '5:30 PM' },
-      { dot: COLORS.gray400, title: 'Ride CDG → Hôtel des Grands Boulevards', time: 'Sat 7:35 AM' },
+      { dot: COLORS.green, active: true, title: 'Ride to JFK Airport', time: '8:00 AM' },
+      { dot: COLORS.gray400, title: 'Flight BA178 to London (LHR)', time: '11:00 AM' },
+      { dot: COLORS.gray400, title: 'Ride LHR → The Hoxton, Holborn', time: '11:45 PM (UK)' },
     ],
   },
   2: {
     tabLabel: 'Day 2',
     tabSub: 'Sat May 9',
     dateLabel: 'SAT MAY 9 · 9:00 AM',
-    subtitle: 'Big day in Paris — Louvre, Eiffel Tower, dinner',
+    subtitle: 'Tower of London + Dishoom dinner tonight',
     nextRide: {
-      label: 'Next ride · in 30 min',
-      title: 'Hotel → Louvre Museum',
+      label: 'Time to leave · in 30 min',
+      title: 'Hotel → Tower of London',
       stats: [
         { label: 'Pickup', value: '9:30 AM', color: '#fff' },
-        { label: 'Drive Time', value: '~10 min', color: '#fff' },
+        { label: 'Drive Time', value: '~12 min', color: '#fff' },
         { label: 'Traffic', value: 'Light', color: COLORS.green },
       ],
     },
-    prompt: {
-      title: 'Leave at 6:50 PM for dinner',
-      badge: 'Reservation alert',
-      body: 'Your dinner reservation at Bistrot Paul Bert is at 7:15 PM. Sat-evening traffic is heavy — leave at 6:50 PM to arrive 5 min early. Want us to book the ride now?',
-      cta: 'Book ride for 6:50 PM',
-      confirm: 'Ride scheduled',
-      confirmDetail: "Driver arrives at Hôtel des Grands Boulevards at 6:50 PM. We'll watch traffic and adjust if needed.",
-    },
+    prompt: null,
     schedule: [
-      { dot: COLORS.green, active: true, title: 'Ride to Louvre', time: '9:30 AM' },
-      { dot: COLORS.gray400, title: 'Ride to Eiffel Tower (Viator entry 2:30 PM)', time: '2:00 PM' },
-      { dot: COLORS.gray400, title: 'Ride back to hotel', time: '5:30 PM' },
-      { dot: COLORS.gray400, title: 'Ride to Bistrot Paul Bert · 7:15 PM seating', time: '6:50 PM' },
+      { dot: COLORS.green, active: true, title: 'Ride to Tower of London', time: '9:30 AM' },
+      { dot: COLORS.gray400, title: 'Ride to Borough Market · lunch', time: '1:00 PM' },
+      { dot: COLORS.gray400, title: 'Ride back to hotel', time: '3:30 PM' },
+      { dot: COLORS.gray400, title: 'Ride to Dishoom · 7:30 PM seating', time: '7:00 PM' },
       { dot: COLORS.gray400, title: 'Ride home from dinner', time: '9:45 PM' },
     ],
   },
   3: {
     tabLabel: 'Day 3',
     tabSub: 'Sun May 10',
-    dateLabel: 'SUN MAY 10 · 9:30 AM',
-    subtitle: 'Heading home today',
+    dateLabel: 'SUN MAY 10 · 9:00 AM',
+    subtitle: 'British Museum + London Eye this afternoon',
     nextRide: {
-      label: 'Next ride · in 1 hr',
-      title: 'Hotel → CDG Airport',
+      label: 'Time to leave · in 60 min',
+      title: 'Hotel → British Museum',
       stats: [
-        { label: 'Pickup', value: '10:30 AM', color: '#fff' },
-        { label: 'TSA Wait Time', value: '~24 min', color: COLORS.amber },
-        { label: 'Traffic', value: 'Sun moderate', color: COLORS.amber },
+        { label: 'Pickup', value: '10:00 AM', color: '#fff' },
+        { label: 'Drive Time', value: '~6 min', color: '#fff' },
+        { label: 'Traffic', value: 'Light', color: COLORS.green },
       ],
     },
-    prompt: {
-      title: 'Croissants & coffee before pickup?',
-      badge: 'Uber Eats',
-      body: 'Du Pain et des Idées (5-min walk) is open and delivers in 12 min. Grab a Parisian breakfast before your 10:30 AM ride to the airport.',
-      cta: 'Order breakfast',
-      confirm: 'Breakfast ordered!',
-      confirmDetail: 'Arrives at hotel lobby by 10:00 AM · Free delivery with Uber One',
-    },
+    prompt: null,
     schedule: [
-      { dot: COLORS.green, active: true, title: 'Ride to CDG Airport', time: '10:30 AM' },
-      { dot: COLORS.gray400, title: 'Flight DL121 to JFK', time: '1:45 PM' },
-      { dot: COLORS.gray400, title: 'Ride JFK → Home', time: '5:15 PM' },
+      { dot: COLORS.green, active: true, title: 'Ride to British Museum', time: '10:00 AM' },
+      { dot: COLORS.gray400, title: 'Ride to London Eye (Viator entry 2:30 PM)', time: '1:30 PM' },
+      { dot: COLORS.gray400, title: 'Ride back to hotel', time: '4:30 PM' },
+      { dot: COLORS.gray400, title: 'Ride to Sunday roast (Hawksmoor)', time: '7:00 PM' },
+    ],
+  },
+  4: {
+    tabLabel: 'Day 4',
+    tabSub: 'Mon May 11',
+    dateLabel: 'MON MAY 11 · 9:30 AM',
+    subtitle: 'Westminster Abbey + Tate Modern',
+    nextRide: {
+      label: 'Time to leave · in 30 min',
+      title: 'Hotel → Westminster Abbey',
+      stats: [
+        { label: 'Pickup', value: '10:00 AM', color: '#fff' },
+        { label: 'Drive Time', value: '~12 min', color: '#fff' },
+        { label: 'Traffic', value: 'Mon AM moderate', color: COLORS.amber },
+      ],
+    },
+    prompt: null,
+    schedule: [
+      { dot: COLORS.green, active: true, title: 'Ride to Westminster Abbey', time: '10:00 AM' },
+      { dot: COLORS.gray400, title: 'Ride to Tate Modern · lunch', time: '1:00 PM' },
+      { dot: COLORS.gray400, title: 'Ride back to hotel', time: '5:00 PM' },
+      { dot: COLORS.gray400, title: 'Ride to Sky Garden · sunset', time: '7:30 PM' },
+    ],
+  },
+  5: {
+    tabLabel: 'Day 5',
+    tabSub: 'Tue May 12',
+    dateLabel: 'TUE MAY 12 · 12:00 PM',
+    subtitle: 'Heading home today — flight at 6:30 PM',
+    nextRide: {
+      label: 'Time to leave · in 3 hr',
+      title: 'Hotel → LHR Airport',
+      stats: [
+        { label: 'Pickup', value: '3:00 PM', color: '#fff' },
+        { label: 'Security', value: '~28 min', color: COLORS.amber },
+        { label: 'Traffic', value: 'Tue PM heavy', color: COLORS.amber },
+      ],
+    },
+    prompt: null,
+    schedule: [
+      { dot: COLORS.green, active: true, title: 'Ride to LHR Airport', time: '3:00 PM' },
+      { dot: COLORS.gray400, title: 'Flight BA177 to JFK', time: '6:30 PM' },
+      { dot: COLORS.gray400, title: 'Ride JFK → Home', time: '10:15 PM' },
     ],
   },
 };
 
 const RESTAURANTS = [
-  { name: 'Bistrot Paul Bert', cuisine: 'French · Classic bistro', rating: 4.8, reviews: '2.1k', price: '$$$', rideMin: 22, tag: 'Your reservation', tagColor: COLORS.green, accent: '#065F46', bg: '#E6F7EF' },
-  { name: 'Le Comptoir du Relais', cuisine: 'French · Saint-Germain', rating: 4.7, reviews: '1.8k', price: '$$$', rideMin: 18, tag: 'Trending', tagColor: COLORS.orange, accent: '#7C2D12', bg: '#FFF4E5' },
-  { name: 'Septime', cuisine: 'French · Modern', rating: 4.9, reviews: '3.2k', price: '$$$$', rideMin: 16, tag: 'Trending', tagColor: COLORS.orange, accent: '#1F2937', bg: '#F3F4F6' },
-  { name: 'Chez Janou', cuisine: 'Provençal · Marais', rating: 4.6, reviews: '2.4k', price: '$$', rideMin: 14, tag: 'Neighborhood favorite', tagColor: COLORS.green, accent: '#065F46', bg: '#E6F7EF' },
-  { name: 'Frenchie', cuisine: 'French · Bistronomie', rating: 4.5, reviews: '1.6k', price: '$$$', rideMin: 8, tag: null, tagColor: null, accent: '#3D3D3D', bg: '#F6F6F6' },
+  { name: 'Dishoom Covent Garden', cuisine: 'Bombay café · Iconic London', rating: 4.8, reviews: '8.2k', price: '$$', rideMin: 18, tag: 'Your reservation', tagColor: COLORS.green, accent: '#065F46', bg: '#E6F7EF' },
+  { name: 'Padella', cuisine: 'Italian · Handmade pasta', rating: 4.7, reviews: '4.1k', price: '$$', rideMin: 14, tag: 'Trending', tagColor: COLORS.orange, accent: '#7C2D12', bg: '#FFF4E5' },
+  { name: 'Hawksmoor Seven Dials', cuisine: 'British · Steakhouse', rating: 4.8, reviews: '5.6k', price: '$$$$', rideMin: 8, tag: 'Trending', tagColor: COLORS.orange, accent: '#1F2937', bg: '#F3F4F6' },
+  { name: 'St. JOHN', cuisine: 'British · Nose-to-tail', rating: 4.6, reviews: '2.3k', price: '$$$', rideMin: 12, tag: 'Neighborhood favorite', tagColor: COLORS.green, accent: '#065F46', bg: '#E6F7EF' },
+  { name: 'Gymkhana', cuisine: 'Indian · Mayfair', rating: 4.9, reviews: '3.4k', price: '$$$$', rideMin: 16, tag: null, tagColor: null, accent: '#3D3D3D', bg: '#F6F6F6' },
 ];
 
 function ExploreRestaurants({ close, onPick }) {
@@ -1858,8 +1890,8 @@ function ExploreRestaurants({ close, onPick }) {
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
             <div style={{ flex: 1 }}>
               <div style={{ fontFamily: FONT, fontSize: 11, fontWeight: 800, letterSpacing: 1, color: COLORS.gray500, textTransform: 'uppercase' }}>Dinner · Sat May 9</div>
-              <div style={{ fontFamily: FONT, fontSize: 22, fontWeight: 800, letterSpacing: -0.5, marginTop: 4 }}>Bistrot Paul Bert area</div>
-              <div style={{ fontFamily: FONT, fontSize: 13, color: COLORS.gray500, marginTop: 4 }}>Pickup ready at 6:50 PM · Reservation at 7:15 PM</div>
+              <div style={{ fontFamily: FONT, fontSize: 22, fontWeight: 800, letterSpacing: -0.5, marginTop: 4 }}>Dishoom area · Covent Garden</div>
+              <div style={{ fontFamily: FONT, fontSize: 13, color: COLORS.gray500, marginTop: 4 }}>Pickup ready at 7:00 PM · Reservation at 7:30 PM</div>
             </div>
             <button onClick={close} aria-label="Close" style={{
               width: 32, height: 32, borderRadius: 16, border: 'none',
@@ -1948,6 +1980,660 @@ function ExploreRestaurants({ close, onPick }) {
   );
 }
 
+// ─────────────────────────────────────────────────────────────
+// Explore London — single hero card + drawer with full city insights
+// (replaces the previous Discover / Wait Times tabbed widget)
+// ─────────────────────────────────────────────────────────────
+const LONDON_PERKS = [
+  {
+    name: 'Monmouth Coffee', where: 'Borough Market · 0.8 mi', rating: 4.8,
+    perk: '10% off for Members', time: '~5 min',
+    img: { bg: 'linear-gradient(135deg, #6F4E37 0%, #A0826D 100%)', emoji: '☕' },
+  },
+  {
+    name: 'Shoreditch Works', where: 'Shoreditch · 1.2 mi', rating: 4.6,
+    perk: 'Free first hour', time: '~2 min',
+    img: { bg: 'linear-gradient(135deg, #4B5563 0%, #9CA3AF 100%)', emoji: '💼' },
+  },
+  {
+    name: 'Sky Garden', where: 'Fenchurch St · 2.1 mi', rating: 4.9,
+    perk: 'Skip the queue', time: 'No wait',
+    img: { bg: 'linear-gradient(135deg, #0EA5E9 0%, #FB923C 100%)', emoji: '🌇' },
+  },
+  {
+    name: 'Borough Market', where: 'Southwark · 1.0 mi', rating: 4.7,
+    perk: '£5 Eats credit', time: '~4 min',
+    img: { bg: 'linear-gradient(135deg, #16A34A 0%, #FCD34D 100%)', emoji: '🥖' },
+  },
+];
+
+const LONDON_NEIGHBORHOODS = [
+  { name: 'Soho', wait: 3, level: 'med' },
+  { name: 'Shoreditch', wait: 2, level: 'low' },
+  { name: 'Camden', wait: 5, level: 'high' },
+  { name: 'Covent Garden', wait: 4, level: 'med' },
+  { name: 'South Bank', wait: 2, level: 'low' },
+  { name: 'Notting Hill', wait: 6, level: 'high' },
+];
+
+const LONDON_AIRPORTS = [
+  { code: 'LHR', name: 'London Heathrow Airport' },
+  { code: 'LGW', name: 'London Gatwick Airport' },
+  { code: 'STN', name: 'London Stansted Airport' },
+  { code: 'LCY', name: 'London City Airport' },
+  { code: 'LTN', name: 'London Luton Airport' },
+];
+
+function LondonHeroSkyline() {
+  return (
+    <div style={{
+      height: 160, position: 'relative', overflow: 'hidden',
+      background: '#1E3A8A',
+    }}>
+      <img src="assets/Lonben.jpeg" alt="London — Big Ben"
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}/>
+    </div>
+  );
+}
+
+function ExploreLondonCard({ onOpen }) {
+  return (
+    <button onClick={onOpen} style={{
+      width: '100%', background: '#fff', border: `1px solid ${COLORS.gray200}`,
+      borderRadius: 16, overflow: 'hidden', cursor: 'pointer', textAlign: 'left',
+      padding: 0, display: 'block',
+    }}>
+      <LondonHeroSkyline/>
+      <div style={{ padding: '16px 18px 18px' }}>
+        <div style={{ fontFamily: FONT, fontSize: 19, fontWeight: 800, letterSpacing: -0.4, color: '#000' }}>
+          Explore in London 🇬🇧
+        </div>
+        <div style={{ fontFamily: FONT, fontSize: 13.5, color: COLORS.gray700, marginTop: 8, lineHeight: 1.4 }}>
+          Avg wait <strong style={{ color: '#000' }}>10–15 min</strong> · Avg ride price <strong style={{ color: '#000' }}>€17–€24</strong>
+        </div>
+        <div style={{ fontFamily: FONT, fontSize: 13.5, fontWeight: 800, color: '#000', marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+          Get city insights
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+            <path d="M3 2.5L7 5.5 3 8.5" stroke="#000" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </button>
+  );
+}
+
+function ExploreLondonDrawer({ open, onClose }) {
+  const [expandedAirport, setExpandedAirport] = React.useState(null);
+  if (!open) return null;
+  const chipColor = (level) => {
+    if (level === 'low') return { bg: '#DCFCE7', fg: '#065F46' };
+    if (level === 'med') return { bg: '#FEF3C7', fg: '#92400E' };
+    return { bg: '#FEE2E2', fg: '#9F1239' };
+  };
+  return (
+    <div style={{ position: 'absolute', inset: 0, zIndex: 100 }}>
+      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', animation: 'fadeIn 0.2s ease' }}/>
+      <div style={{
+        position: 'absolute', left: 0, right: 0, bottom: 0, top: 60,
+        background: '#fff', borderTopLeftRadius: 22, borderTopRightRadius: 22,
+        animation: 'slideUp 0.3s cubic-bezier(.2,.8,.2,1)',
+        display: 'flex', flexDirection: 'column',
+      }}>
+        {/* Header */}
+        <div style={{ flexShrink: 0, padding: '10px 20px 14px', borderBottom: `0.5px solid ${COLORS.gray100}` }}>
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: COLORS.gray200, margin: '6px auto 14px' }}/>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontFamily: FONT, fontSize: 22, fontWeight: 800, letterSpacing: -0.5 }}>Explore in London</div>
+              <div style={{ fontFamily: FONT, fontSize: 12.5, color: COLORS.gray500, marginTop: 6, lineHeight: 1.5 }}>
+                It takes an average of <strong style={{ color: '#000' }}>10–15 min</strong> to get a ride in central London,
+                with rides typically costing <strong style={{ color: '#000' }}>€17–€24</strong>. Member perks unlock free delivery, queue skips, and ride credits.
+              </div>
+            </div>
+            <button onClick={onClose} aria-label="Close" style={{
+              width: 32, height: 32, borderRadius: 16, border: 'none',
+              background: COLORS.gray100, cursor: 'pointer', flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 3l8 8M11 3l-8 8" stroke="#000" strokeWidth="1.6" strokeLinecap="round"/></svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Scrollable content */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '18px 20px 28px' }}>
+          {/* Uber Eats nearby */}
+          <div style={{ fontFamily: FONT, fontSize: 11, fontWeight: 800, letterSpacing: 1, color: COLORS.gray500, textTransform: 'uppercase', marginBottom: 10 }}>
+            ✨ Uber Eats nearby
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 22 }}>
+            {LONDON_PERKS.map((p, i) => (
+              <div key={i} style={{
+                background: '#fff', border: `1px solid ${COLORS.gray200}`, borderRadius: 14,
+                padding: 10, display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',
+              }}>
+                <div style={{
+                  width: 60, height: 60, borderRadius: 10, background: p.img.bg,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0, fontSize: 24,
+                }}>{p.img.emoji}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 6 }}>
+                    <div style={{ fontFamily: FONT, fontSize: 14, fontWeight: 800, letterSpacing: -0.2 }}>{p.name}</div>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
+                      <span style={{ color: '#F59E0B', fontSize: 12 }}>★</span>
+                      <span style={{ fontFamily: FONT, fontSize: 12, fontWeight: 700, color: '#000' }}>{p.rating}</span>
+                    </div>
+                  </div>
+                  <div style={{ fontFamily: FONT, fontSize: 11.5, color: COLORS.gray500, marginTop: 2 }}>{p.where}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 6 }}>
+                    <span style={{
+                      background: '#DBEAFE', color: '#1D4ED8',
+                      fontFamily: FONT, fontSize: 11, fontWeight: 700,
+                      padding: '3px 8px', borderRadius: 6, letterSpacing: -0.1,
+                    }}>{p.perk}</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontFamily: FONT, fontSize: 11, color: COLORS.gray500 }}>
+                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                        <circle cx="6" cy="6" r="5" stroke={COLORS.gray500} strokeWidth="1.2"/>
+                        <path d="M6 3.5V6l1.8 1.2" stroke={COLORS.gray500} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      {p.time}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Predicted wait times */}
+          <div style={{ fontFamily: FONT, fontSize: 11, fontWeight: 800, letterSpacing: 1, color: COLORS.gray500, textTransform: 'uppercase', marginBottom: 10 }}>
+            🗺 Predicted wait times by area
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 22 }}>
+            {LONDON_NEIGHBORHOODS.map((n, i) => {
+              const c = chipColor(n.level);
+              return (
+                <div key={i} style={{
+                  background: '#fff', border: `1px solid ${COLORS.gray200}`, borderRadius: 12,
+                  padding: '11px 14px', display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',
+                }}>
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0 }}>
+                    <path d="M7 1.5C4.8 1.5 3 3.3 3 5.5c0 3 4 7 4 7s4-4 4-7c0-2.2-1.8-4-4-4z" stroke={COLORS.gray500} strokeWidth="1.4" strokeLinejoin="round"/>
+                    <circle cx="7" cy="5.5" r="1.5" stroke={COLORS.gray500} strokeWidth="1.4"/>
+                  </svg>
+                  <div style={{ flex: 1, fontFamily: FONT, fontSize: 13.5, fontWeight: 700, color: '#000' }}>{n.name}</div>
+                  <span style={{
+                    background: c.bg, color: c.fg, fontFamily: FONT,
+                    fontSize: 11, fontWeight: 800, padding: '4px 9px', borderRadius: 6,
+                  }}>{n.wait} min</span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Airports */}
+          <div style={{ fontFamily: FONT, fontSize: 11, fontWeight: 800, letterSpacing: 1, color: COLORS.gray500, textTransform: 'uppercase', marginBottom: 10 }}>
+            ✈️ Need a ride to the airport?
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {LONDON_AIRPORTS.map((a, i) => {
+              const isOpen = expandedAirport === a.code;
+              return (
+                <div key={i} style={{
+                  background: '#fff', border: `1px solid ${COLORS.gray200}`, borderRadius: 12, overflow: 'hidden',
+                }}>
+                  <button onClick={() => setExpandedAirport(isOpen ? null : a.code)} style={{
+                    width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                    padding: '11px 14px', border: 'none', background: 'none', cursor: 'pointer', textAlign: 'left',
+                  }}>
+                    <div style={{
+                      width: 38, height: 38, borderRadius: 8, background: '#000',
+                      color: '#fff', fontFamily: FONT, fontSize: 11.5, fontWeight: 800,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                      letterSpacing: 0.3,
+                    }}>{a.code}</div>
+                    <div style={{ flex: 1, fontFamily: FONT, fontSize: 13.5, fontWeight: 700, color: '#000' }}>{a.name}</div>
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{
+                      flexShrink: 0, transition: 'transform 0.18s ease',
+                      transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                    }}>
+                      <path d="M3 4.5l3 3 3-3" stroke="#000" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
+                  {isOpen && (
+                    <div style={{ padding: '0 14px 12px', fontFamily: FONT, fontSize: 12, color: COLORS.gray700, lineHeight: 1.5 }}>
+                      Avg ride from central London · <strong>£45–£75</strong> · ~45–60 min depending on traffic. Pre-book via the standard Uber flow.
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Wrapper to keep the existing call site working
+function LocalRecsWidget() {
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  return (
+    <>
+      <ExploreLondonCard onOpen={() => setDrawerOpen(true)}/>
+      <ExploreLondonDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)}/>
+    </>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// (Removed legacy LocalRecsWidget data — now lives at top of file)
+// ─────────────────────────────────────────────────────────────
+function _LegacyLocalRecsWidget_unused() {
+  const [tab, setTab] = React.useState('discover');
+  const PERKS = [
+    {
+      name: 'Monmouth Coffee',
+      where: 'Borough Market · 0.8 mi',
+      rating: 4.8,
+      perk: '10% off for Members',
+      perkColor: '#1D4ED8',
+      perkBg: '#DBEAFE',
+      time: '~5 min',
+      img: { bg: 'linear-gradient(135deg, #6F4E37 0%, #A0826D 100%)', emoji: '☕' },
+    },
+    {
+      name: 'Shoreditch Works',
+      where: 'Shoreditch · 1.2 mi',
+      rating: 4.6,
+      perk: 'Free first hour',
+      perkColor: '#1D4ED8',
+      perkBg: '#DBEAFE',
+      time: '~2 min',
+      img: { bg: 'linear-gradient(135deg, #4B5563 0%, #9CA3AF 100%)', emoji: '💼' },
+    },
+    {
+      name: 'Sky Garden',
+      where: 'Fenchurch St · 2.1 mi',
+      rating: 4.9,
+      perk: 'Skip the queue',
+      perkColor: '#1D4ED8',
+      perkBg: '#DBEAFE',
+      time: 'No wait',
+      img: { bg: 'linear-gradient(135deg, #0EA5E9 0%, #FB923C 100%)', emoji: '🌇' },
+    },
+    {
+      name: 'Borough Market',
+      where: 'Southwark · 1.0 mi',
+      rating: 4.7,
+      perk: '£5 Eats credit',
+      perkColor: '#1D4ED8',
+      perkBg: '#DBEAFE',
+      time: '~4 min',
+      img: { bg: 'linear-gradient(135deg, #16A34A 0%, #FCD34D 100%)', emoji: '🥖' },
+    },
+  ];
+
+  const NEIGHBORHOODS = [
+    { name: 'Soho', wait: 3, level: 'med' },
+    { name: 'Shoreditch', wait: 2, level: 'low' },
+    { name: 'Camden', wait: 5, level: 'high' },
+    { name: 'Covent Garden', wait: 4, level: 'med' },
+    { name: 'South Bank', wait: 2, level: 'low' },
+    { name: 'Notting Hill', wait: 6, level: 'high' },
+  ];
+
+  const chipColor = (level) => {
+    if (level === 'low') return { bg: '#DCFCE7', fg: '#065F46' };
+    if (level === 'med') return { bg: '#FEF3C7', fg: '#92400E' };
+    return { bg: '#FEE2E2', fg: '#9F1239' };
+  };
+
+  return (
+    <div>
+      {/* Tab toggle */}
+      <div style={{
+        display: 'flex', gap: 6, padding: 4, background: COLORS.gray50,
+        borderRadius: 12, border: `1px solid ${COLORS.gray200}`, marginBottom: 14,
+      }}>
+        {[
+          { k: 'discover', label: 'Discover', icon: '✨' },
+          { k: 'waitTimes', label: 'Wait Times', icon: '🗺' },
+        ].map(t => {
+          const active = tab === t.k;
+          return (
+            <button key={t.k} onClick={() => setTab(t.k)} style={{
+              flex: 1, padding: '9px 12px', borderRadius: 9,
+              background: active ? '#fff' : 'transparent',
+              border: active ? `1px solid ${COLORS.gray300 || '#D1D5DB'}` : '1px solid transparent',
+              fontFamily: FONT, fontSize: 13, fontWeight: 700,
+              color: active ? '#000' : COLORS.gray500, cursor: 'pointer',
+              boxShadow: active ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              transition: 'all 0.15s ease',
+            }}>
+              <span style={{ fontSize: 13 }}>{t.icon}</span>
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {tab === 'discover' && (
+        <>
+          <div style={{ fontFamily: FONT, fontSize: 11, fontWeight: 800, letterSpacing: 1, color: COLORS.gray500, textTransform: 'uppercase', marginBottom: 10 }}>
+            Member perks nearby
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {PERKS.map((p, i) => (
+              <div key={i} style={{
+                background: '#fff', border: `1px solid ${COLORS.gray200}`, borderRadius: 14,
+                padding: 10, display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer',
+              }}>
+                <div style={{
+                  width: 64, height: 64, borderRadius: 10, background: p.img.bg,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0, fontSize: 26,
+                }}>
+                  {p.img.emoji}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 6 }}>
+                    <div style={{ fontFamily: FONT, fontSize: 14.5, fontWeight: 800, letterSpacing: -0.2 }}>{p.name}</div>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
+                      <span style={{ color: '#F59E0B', fontSize: 12 }}>★</span>
+                      <span style={{ fontFamily: FONT, fontSize: 12.5, fontWeight: 700, color: '#000' }}>{p.rating}</span>
+                    </div>
+                  </div>
+                  <div style={{ fontFamily: FONT, fontSize: 12, color: COLORS.gray500, marginTop: 2 }}>{p.where}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 7 }}>
+                    <span style={{
+                      background: p.perkBg, color: p.perkColor,
+                      fontFamily: FONT, fontSize: 11, fontWeight: 700,
+                      padding: '3px 8px', borderRadius: 6, letterSpacing: -0.1,
+                    }}>{p.perk}</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, fontFamily: FONT, fontSize: 11.5, color: COLORS.gray500 }}>
+                      <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                        <circle cx="6" cy="6" r="5" stroke={COLORS.gray500} strokeWidth="1.2"/>
+                        <path d="M6 3.5V6l1.8 1.2" stroke={COLORS.gray500} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      {p.time}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {tab === 'waitTimes' && (
+        <>
+          <div style={{ fontFamily: FONT, fontSize: 11, fontWeight: 800, letterSpacing: 1, color: COLORS.gray500, textTransform: 'uppercase', marginBottom: 10 }}>
+            Predicted Uber wait times
+          </div>
+          {/* Map hero */}
+          <div style={{
+            position: 'relative', height: 130, borderRadius: 14,
+            background: 'linear-gradient(135deg, #E5E7EB 0%, #F3F4F6 50%, #E5E7EB 100%)',
+            overflow: 'hidden', marginBottom: 12,
+          }}>
+            {/* Pseudo street grid */}
+            <svg viewBox="0 0 320 130" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
+              <path d="M0 30 L320 30 M0 65 L320 65 M0 100 L320 100" stroke="#D1D5DB" strokeWidth="1" strokeDasharray="4 4"/>
+              <path d="M50 0 L50 130 M120 0 L120 130 M200 0 L200 130 M270 0 L270 130" stroke="#D1D5DB" strokeWidth="1" strokeDasharray="4 4"/>
+              <path d="M30 110 Q90 70 160 80 T300 50" stroke="#9CA3AF" strokeWidth="3" fill="none" strokeLinecap="round"/>
+              <path d="M0 50 L320 50" stroke="#3B82F6" strokeWidth="2" opacity="0.3" strokeDasharray="6 6"/>
+              {/* Pins */}
+              <circle cx="80" cy="40" r="6" fill="#10B981"/>
+              <circle cx="80" cy="40" r="3" fill="#fff"/>
+              <circle cx="220" cy="90" r="6" fill="#F59E0B"/>
+              <circle cx="220" cy="90" r="3" fill="#fff"/>
+              <circle cx="270" cy="30" r="6" fill="#EF4444"/>
+              <circle cx="270" cy="30" r="3" fill="#fff"/>
+            </svg>
+            {/* Centered overlay */}
+            <div style={{
+              position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+              background: '#fff', borderRadius: 12, padding: '10px 14px',
+              boxShadow: '0 4px 14px rgba(0,0,0,0.12)', textAlign: 'center',
+            }}>
+              <div style={{ fontFamily: FONT, fontSize: 13.5, fontWeight: 800, letterSpacing: -0.2 }}>Central London</div>
+              <div style={{ fontFamily: FONT, fontSize: 11.5, color: COLORS.gray500, marginTop: 1 }}>Avg. wait: 3 min</div>
+            </div>
+          </div>
+
+          {/* Neighborhood list */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {NEIGHBORHOODS.map((n, i) => {
+              const c = chipColor(n.level);
+              return (
+                <div key={i} style={{
+                  background: '#fff', border: `1px solid ${COLORS.gray200}`, borderRadius: 12,
+                  padding: '12px 14px', display: 'flex', alignItems: 'center', gap: 12,
+                  cursor: 'pointer',
+                }}>
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{ flexShrink: 0 }}>
+                    <path d="M7 1.5C4.8 1.5 3 3.3 3 5.5c0 3 4 7 4 7s4-4 4-7c0-2.2-1.8-4-4-4z" stroke={COLORS.gray500} strokeWidth="1.4" strokeLinejoin="round"/>
+                    <circle cx="7" cy="5.5" r="1.5" stroke={COLORS.gray500} strokeWidth="1.4"/>
+                  </svg>
+                  <div style={{ flex: 1, fontFamily: FONT, fontSize: 14, fontWeight: 700, color: '#000' }}>{n.name}</div>
+                  <span style={{
+                    background: c.bg, color: c.fg, fontFamily: FONT,
+                    fontSize: 11.5, fontWeight: 800, padding: '4px 9px', borderRadius: 6,
+                    letterSpacing: -0.1,
+                  }}>{n.wait} min</span>
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ flexShrink: 0, opacity: 0.5 }}>
+                    <path d="M3 2.5L6.5 5 3 7.5" stroke="#000" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Flight Details Drawer — OAG-powered live flight info
+// Shows: check-in desk, baggage drop, gates (with change alert),
+// in-flight status, arrival gate, baggage carousel, terminal info.
+// ─────────────────────────────────────────────────────────────
+function FlightDetailsDrawer({ open, onClose }) {
+  if (!open) return null;
+  return (
+    <div style={{ position: 'absolute', inset: 0, zIndex: 100 }}>
+      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', animation: 'fadeIn 0.2s ease' }}/>
+      <div style={{
+        position: 'absolute', left: 0, right: 0, bottom: 0, top: 40,
+        background: '#fff', borderTopLeftRadius: 22, borderTopRightRadius: 22,
+        animation: 'slideUp 0.3s cubic-bezier(.2,.8,.2,1)',
+        display: 'flex', flexDirection: 'column', overflow: 'hidden',
+      }}>
+        {/* Drag handle + close */}
+        <div style={{ flexShrink: 0, position: 'relative' }}>
+          <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.4)', margin: '8px auto 0', position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', zIndex: 2 }}/>
+          <button onClick={onClose} aria-label="Close" style={{
+            position: 'absolute', top: 16, right: 16, zIndex: 2,
+            width: 32, height: 32, borderRadius: 16, border: 'none',
+            background: 'rgba(255,255,255,0.18)', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 3l8 8M11 3l-8 8" stroke="#fff" strokeWidth="1.8" strokeLinecap="round"/></svg>
+          </button>
+        </div>
+
+        {/* Dark hero — flight summary */}
+        <div style={{ flexShrink: 0, background: '#000', color: '#fff', padding: '26px 22px 22px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{
+              fontFamily: FONT, fontSize: 11, fontWeight: 800, letterSpacing: 1, color: COLORS.green,
+              textTransform: 'uppercase',
+            }}>● Live · OAG data</span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 10 }}>
+            <span style={{ fontFamily: FONT, fontSize: 28, fontWeight: 800, letterSpacing: -0.6 }}>BA178</span>
+            <span style={{ fontFamily: FONT, fontSize: 12.5, color: '#fff', fontWeight: 700, letterSpacing: -0.1 }}>British Airways · Boeing 777</span>
+          </div>
+
+          {/* Route */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 16 }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: FONT, fontSize: 30, fontWeight: 800, letterSpacing: -0.5 }}>JFK</div>
+              <div style={{ fontFamily: FONT, fontSize: 12.5, color: '#fff', fontWeight: 700, marginTop: 4, letterSpacing: -0.1 }}>New York · 11:00 AM</div>
+            </div>
+            <div style={{ flex: 1.4, position: 'relative', height: 24, display: 'flex', alignItems: 'center' }}>
+              <div style={{ height: 1.5, flex: 1, background: 'rgba(255,255,255,0.25)' }}/>
+              <svg width="20" height="20" viewBox="0 0 24 24" style={{ margin: '0 6px' }}>
+                <path d="M22 12 L2 4 L5 12 L2 20 Z" fill="#fff"/>
+              </svg>
+              <div style={{ height: 1.5, flex: 1, background: 'rgba(255,255,255,0.25)' }}/>
+            </div>
+            <div style={{ flex: 1, textAlign: 'right' }}>
+              <div style={{ fontFamily: FONT, fontSize: 30, fontWeight: 800, letterSpacing: -0.5 }}>LHR</div>
+              <div style={{ fontFamily: FONT, fontSize: 12.5, color: '#fff', fontWeight: 700, marginTop: 4, letterSpacing: -0.1 }}>London · 11:00 PM</div>
+            </div>
+          </div>
+
+          {/* Status row */}
+          <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{
+              background: COLORS.green, color: '#fff', fontFamily: FONT, fontSize: 11, fontWeight: 800,
+              padding: '4px 10px', borderRadius: 999, letterSpacing: 0.3, textTransform: 'uppercase',
+            }}>● On time</span>
+            <span style={{ fontFamily: FONT, fontSize: 12.5, color: '#fff', fontWeight: 700, letterSpacing: -0.1 }}>7h 5m flight · 3,459 mi</span>
+          </div>
+        </div>
+
+        {/* Scrollable content */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '20px 20px 28px' }}>
+
+          {/* DEPARTURE */}
+          <div style={{ marginBottom: 22 }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12,
+              fontFamily: FONT, fontSize: 11, fontWeight: 800, letterSpacing: 1,
+              color: COLORS.gray500, textTransform: 'uppercase',
+            }}>
+              <span>🛫</span> Departure · JFK Terminal 7
+            </div>
+            <div style={{ background: COLORS.gray50, border: `0.5px solid ${COLORS.gray200}`, borderRadius: 14, overflow: 'hidden' }}>
+              <FlightInfoRow label="Check-in desk" value="Desk D" sub="Open until 9:30 AM"/>
+              <FlightInfoRow label="Baggage drop" value="Counter 12" sub="3 min walk from check-in"/>
+              <FlightInfoRow
+                label="Boarding gate"
+                value="B22"
+                sub="Subject to change · 8 min walk"
+                rightBadge={{ text: 'May change', bg: COLORS.amberBg, fg: '#92400E' }}
+              />
+              <FlightInfoRow label="Boarding time" value="10:30 AM" sub="30 min before takeoff" last/>
+            </div>
+          </div>
+
+          {/* IN FLIGHT */}
+          <div style={{ marginBottom: 22 }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12,
+              fontFamily: FONT, fontSize: 11, fontWeight: 800, letterSpacing: 1,
+              color: COLORS.gray500, textTransform: 'uppercase',
+            }}>
+              <span>✈️</span> In flight
+            </div>
+            <div style={{ background: COLORS.gray50, border: `0.5px solid ${COLORS.gray200}`, borderRadius: 14, overflow: 'hidden' }}>
+              <FlightInfoRow label="Real-time tracking" value="Active" sub="Monitoring for change"/>
+              <FlightInfoRow label="Estimated duration" value="7h 5m" sub="Lands ~11:00 PM London time"/>
+              <FlightInfoRow label="Wi-Fi" value="Available" sub="BA Connect · purchase onboard" last/>
+            </div>
+          </div>
+
+          {/* ARRIVAL */}
+          <div style={{ marginBottom: 22 }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12,
+              fontFamily: FONT, fontSize: 11, fontWeight: 800, letterSpacing: 1,
+              color: COLORS.gray500, textTransform: 'uppercase',
+            }}>
+              <span>🛬</span> Arrival · LHR Terminal 5
+            </div>
+            <div style={{ background: COLORS.gray50, border: `0.5px solid ${COLORS.gray200}`, borderRadius: 14, overflow: 'hidden' }}>
+              <FlightInfoRow label="Arrival gate" value="Gate 14" sub="Updated in real time"/>
+              <FlightInfoRow label="Terminal" value="Terminal 5"/>
+              <FlightInfoRow
+                label="Baggage carousel"
+                value="Belt 3"
+                sub="Revealed ~5 min before landing"
+                rightBadge={{ text: 'Real-time', bg: COLORS.greenBg, fg: '#065F46' }}
+              />
+              <FlightInfoRow
+                label="Walk to Uber pickup"
+                value="Zone C"
+                sub="4 min walk from Arrivals Hall"
+                last
+              />
+            </div>
+          </div>
+
+          {/* Footer attribution */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+            padding: '10px 0 4px', fontFamily: FONT, fontSize: 11, color: COLORS.gray500,
+          }}>
+            <svg width="10" height="10" viewBox="0 0 10 10">
+              <circle cx="5" cy="5" r="4" fill={COLORS.green}/>
+            </svg>
+            <span>Powered by OAG · Live updates pushed to your lock screen</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FlightInfoRow({ label, value, sub, rightBadge, last }) {
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'flex-start', gap: 14,
+      padding: '14px 16px',
+      borderBottom: !last ? `0.5px solid ${COLORS.gray200}` : 'none',
+      background: '#fff',
+    }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{
+          fontFamily: FONT, fontSize: 11, fontWeight: 700, letterSpacing: 0.4,
+          color: COLORS.gray500, textTransform: 'uppercase',
+        }}>{label}</div>
+        <div style={{
+          fontFamily: FONT, fontSize: 16, fontWeight: 800, color: '#000', marginTop: 3,
+          letterSpacing: -0.2,
+        }}>{value}</div>
+        {sub && (
+          <div style={{ marginTop: 6 }}>
+            <span style={{
+              display: 'inline-block',
+              fontFamily: FONT, fontSize: 11.5, fontWeight: 600,
+              color: COLORS.gray700, background: COLORS.gray100,
+              padding: '4px 9px', borderRadius: 6,
+              letterSpacing: -0.1, lineHeight: 1.3,
+            }}>{sub}</span>
+          </div>
+        )}
+      </div>
+      {rightBadge && (
+        <span style={{
+          background: rightBadge.bg, color: rightBadge.fg,
+          fontFamily: FONT, fontSize: 10, fontWeight: 800,
+          padding: '4px 8px', borderRadius: 6, letterSpacing: 0.2,
+          flexShrink: 0, textTransform: 'uppercase', marginTop: 4,
+        }}>{rightBadge.text}</span>
+      )}
+    </div>
+  );
+}
+
 function Screen9() {
   const [day, setDay] = React.useState(1);
   const [orderedMap, setOrderedMap] = React.useState({});
@@ -1956,13 +2642,10 @@ function Screen9() {
   const tabStripRef = React.useRef(null);
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(false);
+  const [flightDetailsOpen, setFlightDetailsOpen] = React.useState(false);
   const d = DAY_DATA[day];
 
-  // Disabled future-day placeholders for spacing demo
-  const FUTURE_DAYS = [
-    { n: 4, label: 'Day 4', sub: 'Mon May 11' },
-    { n: 5, label: 'Day 5', sub: 'Tue May 12' },
-  ];
+  // 5-day London trip — all days are active
 
   const updateScrollState = () => {
     const el = tabStripRef.current;
@@ -2001,7 +2684,7 @@ function Screen9() {
       <div style={{ background: '#000', color: '#fff', padding: '58px 22px 18px' }}>
         <div style={{ fontFamily: FONT, fontSize: 11, fontWeight: 700, letterSpacing: 1.2, color: '#A8A8A8', textTransform: 'uppercase' }}>{d.dateLabel}</div>
         <div style={{ fontFamily: FONT, fontSize: 26, fontWeight: 800, letterSpacing: -0.5, marginTop: 8, lineHeight: 1.12 }}>
-          Good morning, Sai
+          Good morning, Alex
         </div>
         <div style={{ fontFamily: FONT, fontSize: 14, color: '#A8A8A8', marginTop: 8 }}>
           {d.subtitle}
@@ -2039,7 +2722,7 @@ function Screen9() {
             }}
             className="hide-scrollbar"
           >
-            {[1, 2, 3].map(n => {
+            {[1, 2, 3, 4, 5].map(n => {
               const active = day === n;
               return (
                 <button key={n} onClick={() => setDay(n)} style={{
@@ -2054,17 +2737,6 @@ function Screen9() {
                 </button>
               );
             })}
-            {/* Disabled future-day placeholders */}
-            {FUTURE_DAYS.map(f => (
-              <button key={f.n} disabled style={{
-                flex: '0 0 100px', background: 'transparent',
-                color: '#5A5A5A', border: 'none', borderRadius: 8, padding: '8px 6px',
-                cursor: 'not-allowed', fontFamily: FONT, textAlign: 'center', opacity: 0.55,
-              }}>
-                <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: -0.2 }}>{f.label}</div>
-                <div style={{ fontSize: 10.5, fontWeight: 600, marginTop: 1 }}>{f.sub}</div>
-              </button>
-            ))}
           </div>
 
           {/* Right fade + arrow */}
@@ -2106,81 +2778,143 @@ function Screen9() {
             ))}
           </div>
           <button style={{
-            marginTop: 14, width: '100%', background: 'transparent', color: '#fff',
-            border: '1px solid rgba(255,255,255,0.2)', borderRadius: 10, padding: '10px',
-            fontFamily: FONT, fontSize: 13, fontWeight: 700, cursor: 'pointer', letterSpacing: -0.1,
-          }}>Edit ride</button>
+            marginTop: 14, width: '100%', background: '#fff', color: '#000',
+            border: 'none', borderRadius: 10, padding: '11px',
+            fontFamily: FONT, fontSize: 13.5, fontWeight: 800, cursor: 'pointer', letterSpacing: -0.1,
+          }}>Book ride →</button>
         </div>
       </div>
 
-      {/* contextual prompt */}
-      <div style={{ padding: '14px 20px 0' }}>
-        {!ordered ? (
-          <div style={{ background: COLORS.amberBg, border: `1px solid ${COLORS.amberBorder}`, borderRadius: 16, padding: 18 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      {/* contextual prompt — only when defined for this day */}
+      {d.prompt && (
+        <div style={{ padding: '14px 20px 0' }}>
+          {!ordered ? (
+            <div style={{ background: COLORS.amberBg, border: `1px solid ${COLORS.amberBorder}`, borderRadius: 16, padding: 18 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+                    <path d="M3 11h18a0 0 0 010 0 9 9 0 01-18 0z" fill="#7C2D12"/>
+                    <path d="M9 3c0 1.2 1 1.8 1 3s-1 1.8-1 3" stroke="#7C2D12" strokeWidth="1.5" strokeLinecap="round"/>
+                    <path d="M12 2c0 1.2 1 1.8 1 3s-1 1.8-1 3" stroke="#7C2D12" strokeWidth="1.5" strokeLinecap="round"/>
+                    <path d="M15 3c0 1.2 1 1.8 1 3s-1 1.8-1 3" stroke="#7C2D12" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                  <div style={{ fontFamily: FONT, fontSize: 17, fontWeight: 800, color: '#7C2D12', letterSpacing: -0.3 }}>{d.prompt.title}</div>
+                </div>
+                <span style={{ background: COLORS.orange, color: '#fff', fontFamily: FONT, fontSize: 10, fontWeight: 800, padding: '3px 8px', borderRadius: 10 }}>{d.prompt.badge}</span>
+              </div>
+              <div style={{ fontFamily: FONT, fontSize: 13, color: '#7C2D12', marginTop: 6, lineHeight: 1.4 }}>
+                {d.prompt.body}
+              </div>
+              <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
+                <button onClick={onCtaClick} style={{
+                  flex: 1, background: '#000', color: '#fff', border: 'none', borderRadius: 10,
+                  padding: '11px', fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer',
+                }}>{d.prompt.cta}</button>
+                <button style={{
+                  flex: 1, background: 'transparent', color: '#7C2D12',
+                  border: `1px solid ${COLORS.amberBorder}`, borderRadius: 10,
+                  padding: '11px', fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer',
+                }}>Skip</button>
+              </div>
+            </div>
+          ) : (
+            <div style={{ background: COLORS.greenBg, border: `1px solid #A7E3C4`, borderRadius: 16, padding: 18, animation: 'fadeIn 0.3s ease' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-                  <path d="M3 11h18a0 0 0 010 0 9 9 0 01-18 0z" fill="#7C2D12"/>
-                  <path d="M9 3c0 1.2 1 1.8 1 3s-1 1.8-1 3" stroke="#7C2D12" strokeWidth="1.5" strokeLinecap="round"/>
-                  <path d="M12 2c0 1.2 1 1.8 1 3s-1 1.8-1 3" stroke="#7C2D12" strokeWidth="1.5" strokeLinecap="round"/>
-                  <path d="M15 3c0 1.2 1 1.8 1 3s-1 1.8-1 3" stroke="#7C2D12" strokeWidth="1.5" strokeLinecap="round"/>
-                </svg>
-                <div style={{ fontFamily: FONT, fontSize: 17, fontWeight: 800, color: '#7C2D12', letterSpacing: -0.3 }}>{d.prompt.title}</div>
+                <div style={{ width: 28, height: 28, borderRadius: 14, background: COLORS.green, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 7l3 3 5-5" stroke="#fff" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </div>
+                <div style={{ fontFamily: FONT, fontSize: 16, fontWeight: 800, color: '#065F46', letterSpacing: -0.2 }}>{day === 2 && pickedRestaurant ? `Ride booked to ${pickedRestaurant.name}` : d.prompt.confirm}</div>
               </div>
-              <span style={{ background: COLORS.orange, color: '#fff', fontFamily: FONT, fontSize: 10, fontWeight: 800, padding: '3px 8px', borderRadius: 10 }}>{d.prompt.badge}</span>
-            </div>
-            <div style={{ fontFamily: FONT, fontSize: 13, color: '#7C2D12', marginTop: 6, lineHeight: 1.4 }}>
-              {d.prompt.body}
-            </div>
-            <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
-              <button onClick={onCtaClick} style={{
-                flex: 1, background: '#000', color: '#fff', border: 'none', borderRadius: 10,
-                padding: '11px', fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer',
-              }}>{d.prompt.cta}</button>
-              <button style={{
-                flex: 1, background: 'transparent', color: '#7C2D12',
-                border: `1px solid ${COLORS.amberBorder}`, borderRadius: 10,
-                padding: '11px', fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer',
-              }}>Skip</button>
-            </div>
-          </div>
-        ) : (
-          <div style={{ background: COLORS.greenBg, border: `1px solid #A7E3C4`, borderRadius: 16, padding: 18, animation: 'fadeIn 0.3s ease' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 28, height: 28, borderRadius: 14, background: COLORS.green, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 7l3 3 5-5" stroke="#fff" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <div style={{ fontFamily: FONT, fontSize: 13, color: '#065F46', marginTop: 10, lineHeight: 1.4 }}>
+                {day === 2 && pickedRestaurant
+                  ? `Pickup hotel at 6:50 PM · ${pickedRestaurant.rideMin} min ride · ${pickedRestaurant.cuisine}`
+                  : d.prompt.confirmDetail}
               </div>
-              <div style={{ fontFamily: FONT, fontSize: 16, fontWeight: 800, color: '#065F46', letterSpacing: -0.2 }}>{day === 2 && pickedRestaurant ? `Ride booked to ${pickedRestaurant.name}` : d.prompt.confirm}</div>
             </div>
-            <div style={{ fontFamily: FONT, fontSize: 13, color: '#065F46', marginTop: 10, lineHeight: 1.4 }}>
-              {day === 2 && pickedRestaurant
-                ? `Pickup hotel at 6:50 PM · ${pickedRestaurant.rideMin} min ride · ${pickedRestaurant.cuisine}`
-                : d.prompt.confirmDetail}
-            </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {/* today's schedule */}
-      <div style={{ padding: '20px 20px 30px' }}>
-        <div style={{ fontFamily: FONT, fontSize: 11, fontWeight: 800, letterSpacing: 1, color: COLORS.gray500, textTransform: 'uppercase', marginBottom: 12 }}>{day === 1 ? "Today's Ground Transport Schedule" : `${d.tabLabel} · Ground Transport Schedule`}</div>
+      <div style={{ padding: '20px 20px 4px' }}>
+        <div style={{ fontFamily: FONT, fontSize: 11, fontWeight: 800, letterSpacing: 1, color: COLORS.gray500, textTransform: 'uppercase', marginBottom: 12 }}>{day === 1 ? "Today · Ride plan" : `${d.tabLabel} · Ride plan`}</div>
         {d.schedule.map((r, i) => {
           const isDinner = day === 2 && r.title.startsWith('Dinner ride');
           const title = isDinner && pickedRestaurant ? `Dinner ride · ${pickedRestaurant.name}` : r.title;
+          const isLast = i === d.schedule.length - 1;
+          const isFlight = title.toLowerCase().includes('flight ba178') || title.toLowerCase().includes('flight ba177');
           return (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 0', borderBottom: i < d.schedule.length - 1 ? `0.5px solid ${COLORS.gray100}` : 'none' }}>
-              <div style={{ width: 10, height: 10, borderRadius: 5, background: r.dot, boxShadow: r.active ? `0 0 0 4px ${r.dot}22` : 'none', flexShrink: 0 }}/>
-              <div style={{ flex: 1, fontFamily: FONT, fontSize: 14.5, fontWeight: r.active ? 700 : 600, color: r.active ? '#000' : COLORS.gray700 }}>{title}</div>
-              <div style={{ fontFamily: FONT, fontSize: 13, color: COLORS.gray500 }}>{r.time}</div>
-            </div>
+            <React.Fragment key={i}>
+              <div
+                onClick={isFlight ? () => setFlightDetailsOpen(true) : undefined}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 14, padding: '12px 0',
+                  borderBottom: !r.arrivalGuide && !isLast ? `0.5px solid ${COLORS.gray100}` : 'none',
+                  cursor: isFlight ? 'pointer' : 'default',
+                }}
+              >
+                <div style={{ width: 10, height: 10, borderRadius: 5, background: r.dot, boxShadow: r.active ? `0 0 0 4px ${r.dot}22` : 'none', flexShrink: 0 }}/>
+                <div style={{ flex: 1, fontFamily: FONT, fontSize: 14.5, fontWeight: r.active ? 700 : 600, color: r.active ? '#000' : COLORS.gray700, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {title}
+                  {isFlight && (
+                    <span style={{
+                      fontFamily: FONT, fontSize: 9.5, fontWeight: 800, letterSpacing: 0.4,
+                      color: '#1D4ED8', background: '#DBEAFE',
+                      padding: '2px 6px', borderRadius: 5, textTransform: 'uppercase',
+                    }}>Live · Tap</span>
+                  )}
+                </div>
+                <div style={{ fontFamily: FONT, fontSize: 13, color: COLORS.gray500 }}>{r.time}</div>
+              </div>
+              {r.arrivalGuide && (
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: '0 0 12px 24px', position: 'relative',
+                  borderBottom: !isLast ? `0.5px solid ${COLORS.gray100}` : 'none',
+                }}>
+                  {/* Connector line from parent dot */}
+                  <div style={{
+                    position: 'absolute', left: 4, top: -4, width: 1.5, height: 18,
+                    background: COLORS.gray200,
+                  }}/>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+                    <circle cx="13" cy="4.5" r="2" fill={COLORS.gray500}/>
+                    <path d="M11 8l-2 5 3 2 1 5M14 11l3 1 2-2M11 13l-2 7" stroke={COLORS.gray500} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                  </svg>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: FONT, fontSize: 13, color: '#000', fontWeight: 800, letterSpacing: -0.2 }}>
+                      {typeof r.arrivalGuide === 'string' ? r.arrivalGuide : r.arrivalGuide.lead}
+                    </div>
+                    {typeof r.arrivalGuide === 'object' && r.arrivalGuide.detail && (
+                      <div style={{ fontFamily: FONT, fontSize: 11.5, color: COLORS.gray500, fontWeight: 500, marginTop: 1 }}>
+                        {r.arrivalGuide.detail}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </React.Fragment>
           );
         })}
       </div>
+
+      {/* Section divider + Explore London — only after arrival (Day 2 onwards) */}
+      {day !== 1 && (
+        <>
+          <div style={{ padding: '4px 20px 0' }}>
+            <div style={{ height: 6, background: COLORS.gray50, borderRadius: 3 }}/>
+          </div>
+          <div style={{ padding: '20px 20px 30px' }}>
+            <LocalRecsWidget/>
+          </div>
+        </>
+      )}
     </ScreenShell>
 
     {exploreOpen && (
       <ExploreRestaurants close={() => setExploreOpen(false)} onPick={onRestaurantPick}/>
     )}
+    <FlightDetailsDrawer open={flightDetailsOpen} onClose={() => setFlightDetailsOpen(false)}/>
     </div>
   );
 }
@@ -2206,6 +2940,27 @@ function Notification({ go }) {
 // ─────────────────────────────────────────────────────────────
 function TripDetected({ go, calendarSource = 'gmail' }) {
   const sourceLabel = calendarSource === 'outlook' ? 'Outlook Calendar' : calendarSource === 'icloud' ? 'iCloud Calendar' : calendarSource === 'ios' ? 'your device calendar' : 'Gmail Calendar';
+
+  // Add missing detail (mirrors Page 8 pattern)
+  const [adding, setAdding] = React.useState(false);
+  const [addType, setAddType] = React.useState('activity');
+  const [addValue, setAddValue] = React.useState('');
+  const [addedItems, setAddedItems] = React.useState([]);
+  const ADD_TYPES = [
+    { key: 'activity', label: 'Activity', placeholder: 'e.g. Seine River Cruise · Sat 5pm', icon: '🎟️' },
+    { key: 'flight',   label: 'Flight',   placeholder: 'e.g. AF234 · May 9, 8:00 AM LHR → ORY', icon: '✈️' },
+    { key: 'hotel',    label: 'Hotel',    placeholder: 'e.g. Hôtel Plaza Athénée · 1 night', icon: '🏨' },
+    { key: 'reservation', label: 'Reservation', placeholder: 'e.g. Lunch at Le Comptoir · 1pm', icon: '🍽️' },
+  ];
+  const confirmAdd = () => {
+    if (!addValue.trim()) return;
+    const t = ADD_TYPES.find(t => t.key === addType);
+    setAddedItems(items => [...items, { icon: t.icon, label: t.label, value: addValue.trim() }]);
+    setAddType('activity');
+    setAddValue('');
+    setAdding(false);
+  };
+
   return (
     <ScreenShell>
       {/* header */}
@@ -2217,13 +2972,13 @@ function TripDetected({ go, calendarSource = 'gmail' }) {
           </span>
         </div>
         <div style={{ fontFamily: FONT, fontSize: 11, fontWeight: 700, letterSpacing: 1.2, color: '#A8A8A8', textTransform: 'uppercase', marginBottom: 8 }}>
-          Paris, France 🇫🇷
+          London, UK 🇬🇧
         </div>
         <div style={{ fontFamily: FONT, fontSize: 26, fontWeight: 800, letterSpacing: -0.5, lineHeight: 1.12 }}>
           New trip detected from your calendar
         </div>
         <div style={{ fontFamily: FONT, fontSize: 14, color: '#A8A8A8', marginTop: 8 }}>
-          Fri May 8 → Sun May 10 · couple · via {sourceLabel}
+          Fri May 8 → Tue May 12 · 5 days · couple · via {sourceLabel}
         </div>
       </div>
 
@@ -2234,14 +2989,14 @@ function TripDetected({ go, calendarSource = 'gmail' }) {
         </div>
         <div style={{ background: COLORS.gray50, borderRadius: 16, overflow: 'hidden', border: `0.5px solid ${COLORS.gray200}` }}>
           {[
-            { icon: '✈️', label: 'Outbound flight', value: 'DL120 · JFK → CDG · Fri May 8, 5:30 PM', status: 'Delta' },
-            { icon: '🏨', label: 'Hotel', value: 'Hôtel des Grands Boulevards · 2 nights', status: 'Booking.com' },
-            { icon: '🛬', label: 'Return flight', value: 'DL121 · CDG → JFK · Sun May 10, 1:45 PM', status: 'Delta' },
-          ].map((r, i, arr) => (
+            { icon: '✈️', label: 'Outbound flight', value: 'BA178 · JFK → LHR · Fri May 8, 11:00 AM', status: 'British Airways' },
+            { icon: '🏨', label: 'Hotel', value: 'The Hoxton, Holborn · 4 nights', status: 'Booking.com' },
+            { icon: '🛬', label: 'Return flight', value: 'BA177 · LHR → JFK · Tue May 12, 6:30 PM', status: 'British Airways' },
+          ].map((r, i) => (
             <div key={i} style={{
               display: 'flex', alignItems: 'center', gap: 14,
               padding: '14px 16px',
-              borderBottom: i < arr.length - 1 ? `0.5px solid ${COLORS.gray200}` : 'none',
+              borderBottom: `0.5px solid ${COLORS.gray200}`,
             }}>
               <div style={{ fontSize: 18, width: 28, textAlign: 'center', flexShrink: 0 }}>{r.icon}</div>
               <div style={{ flex: 1 }}>
@@ -2251,6 +3006,75 @@ function TripDetected({ go, calendarSource = 'gmail' }) {
               <span style={{ background: COLORS.greenBg, color: COLORS.green, fontFamily: FONT, fontSize: 11, fontWeight: 800, padding: '3px 8px', borderRadius: 6 }}>{r.status}</span>
             </div>
           ))}
+
+          {/* User-added items */}
+          {addedItems.map((r, i) => (
+            <div key={'added-' + i} style={{
+              display: 'flex', alignItems: 'center', gap: 14,
+              padding: '14px 16px',
+              borderBottom: `0.5px solid ${COLORS.gray200}`,
+            }}>
+              <div style={{ fontSize: 18, width: 28, textAlign: 'center', flexShrink: 0 }}>{r.icon}</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontFamily: FONT, fontSize: 11, fontWeight: 700, color: COLORS.gray500, textTransform: 'uppercase', letterSpacing: 0.4 }}>{r.label}</div>
+                <div style={{ fontFamily: FONT, fontSize: 14, fontWeight: 600, color: '#000', marginTop: 2 }}>{r.value}</div>
+              </div>
+              <span style={{ background: COLORS.gray100, color: COLORS.gray700, fontFamily: FONT, fontSize: 11, fontWeight: 800, padding: '3px 8px', borderRadius: 6 }}>Added by you</span>
+            </div>
+          ))}
+
+          {/* Add missing detail row */}
+          {!adding ? (
+            <button onClick={() => setAdding(true)} style={{
+              width: '100%', background: 'none', border: 'none', textAlign: 'left',
+              cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12,
+              padding: '13px 14px',
+            }}>
+              <div style={{ width: 32, height: 32, borderRadius: 8, background: '#fff', border: `1.5px dashed ${COLORS.gray400}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v10M2 7h10" stroke="#000" strokeWidth="1.8" strokeLinecap="round"/></svg>
+              </div>
+              <div style={{ fontFamily: FONT, fontSize: 14, fontWeight: 700, color: '#000' }}>Add missing detail</div>
+              <div style={{ marginLeft: 'auto', fontFamily: FONT, fontSize: 12, color: COLORS.gray400 }}>flight, hotel, activity…</div>
+            </button>
+          ) : (
+            <div style={{ padding: '14px 14px' }}>
+              {/* type chips */}
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
+                {ADD_TYPES.map(t => (
+                  <button key={t.key} onClick={() => setAddType(t.key)} style={{
+                    padding: '5px 12px', borderRadius: 20, fontFamily: FONT, fontSize: 12.5, fontWeight: 700,
+                    cursor: 'pointer', border: 'none',
+                    background: addType === t.key ? '#000' : COLORS.gray100,
+                    color: addType === t.key ? '#fff' : COLORS.gray700,
+                    transition: 'all 0.15s',
+                  }}>{t.label}</button>
+                ))}
+              </div>
+              {/* input */}
+              <input
+                autoFocus
+                value={addValue}
+                onChange={e => setAddValue(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && confirmAdd()}
+                placeholder={ADD_TYPES.find(t => t.key === addType)?.placeholder}
+                style={{
+                  width: '100%', fontFamily: FONT, fontSize: 14, fontWeight: 500,
+                  border: `1.5px solid #000`, borderRadius: 8, padding: '9px 12px',
+                  outline: 'none', background: '#fff', marginBottom: 10,
+                }}
+              />
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button onClick={confirmAdd} style={{
+                  flex: 1, background: '#000', color: '#fff', border: 'none', borderRadius: 8,
+                  padding: '10px', fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer',
+                }}>Add</button>
+                <button onClick={() => { setAdding(false); setAddValue(''); }} style={{
+                  flex: 1, background: COLORS.gray100, color: '#000', border: 'none', borderRadius: 8,
+                  padding: '10px', fontFamily: FONT, fontSize: 13.5, fontWeight: 700, cursor: 'pointer',
+                }}>Cancel</button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Reservations footer chip */}
@@ -2260,25 +3084,14 @@ function TripDetected({ go, calendarSource = 'gmail' }) {
         }}>
           <div style={{ width: 8, height: 8, borderRadius: 4, background: COLORS.green, flexShrink: 0, boxShadow: `0 0 0 3px ${COLORS.green}33` }}/>
           <div style={{ fontFamily: FONT, fontSize: 12.5, color: '#065F46', lineHeight: 1.4, flex: 1 }}>
-            <strong>+ 3 reservations also detected</strong> — Louvre, Eiffel Tower, dinner. Included in your day-by-day plan.
+            <strong>+ 3 reservations also detected</strong> — Tower of London, London Eye, Dishoom dinner. Included in your day-by-day plan.
           </div>
-        </div>
-      </div>
-
-      {/* source note */}
-      <div style={{ margin: '14px 20px 0', padding: '12px 14px', background: '#F0FDF4', borderRadius: 12, border: `1px solid #A7E3C4`, display: 'flex', alignItems: 'center', gap: 10 }}>
-        <svg width="16" height="16" viewBox="0 0 16 16" style={{ flexShrink: 0 }}><path d="M8 1a4 4 0 014 4v2h1a1 1 0 011 1v6a1 1 0 01-1 1H3a1 1 0 01-1-1V8a1 1 0 011-1h1V5a4 4 0 014-4zm0 2a2 2 0 00-2 2v2h4V5a2 2 0 00-2-2z" fill={COLORS.green}/></svg>
-        <div style={{ fontFamily: FONT, fontSize: 12, color: '#065F46', lineHeight: 1.4 }}>
-          Read-only access · your calendar data is never stored · revoke anytime in Settings
         </div>
       </div>
 
       {/* CTA */}
       <div style={{ padding: '20px 20px 0' }}>
         <BlackButton onClick={go}>Review AI plan →</BlackButton>
-        <div style={{ fontFamily: FONT, fontSize: 12, color: COLORS.gray500, textAlign: 'center', marginTop: 12, lineHeight: 1.4 }}>
-          Uber AI is building your door-to-door plan in the background
-        </div>
       </div>
     </ScreenShell>
   );
@@ -2405,7 +3218,7 @@ function AuthName({ back, go }) {
       </div>
       <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>
         {[
-          { label: 'First name', value: 'Sai' },
+          { label: 'First name', value: 'Alex' },
           { label: 'Last name', value: 'Vuppalapati' },
           { label: 'Work email', value: 'sai@acecorp.com' },
         ].map(f => (
@@ -2437,7 +3250,7 @@ function AuthWelcomeBack({ back, go }) {
           boxShadow: `0 0 0 6px ${COLORS.greenBg}, 0 0 0 8px ${COLORS.green}`,
         }}>S</div>
         <h1 style={{ fontFamily: FONT, fontSize: 28, fontWeight: 800, lineHeight: 1.15, letterSpacing: -0.7, margin: 0 }}>
-          Welcome back, Sai
+          Welcome back, Alex
         </h1>
         <p style={{ fontFamily: FONT, fontSize: 14, color: COLORS.gray500, marginTop: 10, lineHeight: 1.5 }}>
           We recognized this number from your personal Uber. Uber One can now use the same account for business rides — your ride history stays private.
